@@ -28,7 +28,6 @@ get_api_key <- function(service_name, update_key = FALSE) {
     api_key <- Sys.getenv("OPENAI_API_KEY")
 
     if (nzchar(api_key)) {
-      print(api_key)
       return(api_key)
     }
   }
@@ -41,7 +40,6 @@ get_api_key <- function(service_name, update_key = FALSE) {
     api_key <- Sys.getenv("OPENAI_API_KEY")
 
     if (nzchar(api_key)) {
-      print(api_key)
       return(api_key)
     }
   }
