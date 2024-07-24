@@ -20,13 +20,16 @@
 ## get_api_key helper function
 
 get_api_key <- function(service_name, update_key = FALSE) {
+  # Check if running on shinyapps.io
+  shinyapps <- nzchar(Sys.getenv("SHINYAPPS"))
 
-  print(shiny::isRunning())
   # Check if running shiny app
-  if (shiny::isRunning()) {
+  if (shinyapps) {
+    # Attempt to retrieve the API key from environment variable
     api_key <- Sys.getenv("OPENAI_API_KEY")
-    print(api_key)
+
     if (nzchar(api_key)) {
+      print(api_key)
       return(api_key)
     }
   }
@@ -45,7 +48,7 @@ get_api_key <- function(service_name, update_key = FALSE) {
   }
 
   # If not found in environment variable and not in CI, attempt to retrieve from keyring
-  if (!ci && (update_key || nrow(keyring::key_list(service = service_name)) == 0)) {
+  if (!ci && !shinyapps && (update_key || nrow(keyring::key_list(service = service_name)) == 0)) {
     cat("To use this functionality, an API key needs to be set.\n")
     cat("Please follow these steps to resolve the issue:\n")
     if (service_name == "anyscale") {
