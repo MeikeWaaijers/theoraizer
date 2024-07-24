@@ -1,0 +1,27 @@
+Package: theoraizer
+Type: Package
+Title: Develop Theories using Large Language Models
+Version: 0.1.0
+Authors@R: person("Meike", "Waaijers", email = "m.waaijers@uva.nl",
+  role = c("aut", "cre"))
+Maintainer: Meike Waaijers <m.waaijers@uva.nl>
+Description: Use Large Language Models (LLMs) to construct a coherent theory
+  within the Causal Loop Diagram (CLD) framework. The theory consists of key
+  variables and their causal relationships, and can be visually represented.
+URL: https://github.com/MeikeWaaijers/theoraizer
+Depends: 
+    R (>= 2.10)
+Imports: 
+    httr (>= 1.4.7),
+    utils (>= 4.3.2),
+    keyring (>= 1.3.2),
+    qgraph (>= 1.9.8)
+License: AGPL (>= 3)
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.1
+Suggests: 
+    httptest,
+    testthat (>= 3.0.0),
+    vcr (>= 0.6.0)
+Config/testthat/edition: 3
