@@ -21,8 +21,7 @@
 
 get_api_key <- function(service_name, update_key = FALSE) {
   # Check if running on shinyapps.io
-  shinyapps <- nzchar(Sys.getenv("SHINYAPPS"))
-
+  shinyapps <- Sys.getenv("R_CONFIG_ACTIVE") == "shinyapps"
   # Check if running shiny app
   if (shinyapps) {
     # Attempt to retrieve the API key from environment variable
