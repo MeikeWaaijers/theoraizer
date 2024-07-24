@@ -43,7 +43,7 @@ get_api_key <- function(service_name, update_key = FALSE) {
   }
 
   # If not found in environment variable and not in CI, attempt to retrieve from keyring
-  if (!ci && (update_key || nrow(keyring::key_list(service = service_name)) == 0)) {
+  if (!ci && !shiny::isRunning() && (update_key || nrow(keyring::key_list(service = service_name)) == 0)) {
     cat("To use this functionality, an API key needs to be set.\n")
     cat("Please follow these steps to resolve the issue:\n")
     if (service_name == "anyscale") {
