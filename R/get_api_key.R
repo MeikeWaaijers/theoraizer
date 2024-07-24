@@ -19,7 +19,17 @@
 
 ## get_api_key helper function
 
-get_api_key <- function(service_name, input_api_key = NULL, update_key = FALSE) {
+get_api_key <- function(service_name, update_key = FALSE) {
+  # Check if running shiny app
+  if(shiny::isRunning()) {
+
+    api_key <- Sys.getenv("OPENAI_API_KEY")
+
+    if (nzchar(api_key)) {
+      return(api_key)
+    }
+  }
+
   # Check if running in a CI environment
   ci <- nzchar(Sys.getenv("CI"))
 
@@ -28,32 +38,22 @@ get_api_key <- function(service_name, input_api_key = NULL, update_key = FALSE) 
     api_key <- Sys.getenv("OPENAI_API_KEY")
 
     if (nzchar(api_key)) {
-      print(api_key)
       return(api_key)
     }
   }
 
   # If not found in environment variable and not in CI, attempt to retrieve from keyring
   if (!ci && (update_key || nrow(keyring::key_list(service = service_name)) == 0)) {
-    if (is.null(input_api_key)) {
-      cat("To use this functionality, an API key needs to be set.\n")
-      cat("Please follow these steps to resolve the issue:\n")
-      if (service_name == "anyscale") {
-        cat("1. Create an API key on https://app.endpoints.anyscale.com/credentials \n")
-      } else if (service_name == "openai") {
-        cat("1. Create an API key on https://platform.openai.com/account/api-keys \n")
-      }
-      cat("2. Please enter your API key below to add/update it.")
-      answer <- readline("API key = ")
-      keyring::key_set_with_value(service = service_name, username = "user", password = answer)
-
-    } else if (is.null(input_api_key)) {
-      keyring::key_set_with_value(service = service_name, username = "user", password = input_api_key)
-
-    } else {
-      stop("API key is required but not provided.")
+    cat("To use this functionality, an API key needs to be set.\n")
+    cat("Please follow these steps to resolve the issue:\n")
+    if (service_name == "anyscale") {
+      cat("1. Create an API key on https://app.endpoints.anyscale.com/credentials \n")
+    } else if (service_name == "openai") {
+      cat("1. Create an API key on https://platform.openai.com/account/api-keys \n")
     }
-
+    cat("2. Please enter your API key below to add/update it.")
+    answer <- readline("API key = ")
+    keyring::key_set_with_value(service = service_name, username = "user", password = answer)
   }
 
   return(keyring::key_get(service = service_name, username = "user"))
