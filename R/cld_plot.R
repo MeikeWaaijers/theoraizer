@@ -230,17 +230,15 @@ cld_plot <- function(topic,
     edge_index <- 1
     var_index <- 1
     for (y in relation_df$prob_causal){
-      if (y > 0) {
-        edge_list_cdf[edge_index, 1] <- var_1[var_index]
-        edge_list_cdf[edge_index, 2] <- var_2[var_index]
-        edge_list_cdf[edge_index, 3] <- y
-        edge_index <- edge_index + 1
-        #also other way around to create undirected edgelist
-        edge_list_cdf[edge_index, 1] <- var_2[var_index]
-        edge_list_cdf[edge_index, 2] <- var_1[var_index]
-        edge_list_cdf[edge_index, 3] <- y
-        edge_index <- edge_index + 1
-      }
+      edge_list_cdf[edge_index, 1] <- var_1[var_index]
+      edge_list_cdf[edge_index, 2] <- var_2[var_index]
+      edge_list_cdf[edge_index, 3] <- y
+      edge_index <- edge_index + 1
+      #also other way around to create undirected edgelist
+      edge_list_cdf[edge_index, 1] <- var_2[var_index]
+      edge_list_cdf[edge_index, 2] <- var_1[var_index]
+      edge_list_cdf[edge_index, 3] <- y
+      edge_index <- edge_index + 1
       var_index <- var_index + 1
     }
 
@@ -349,23 +347,19 @@ cld_plot <- function(topic,
     edge_index <- 1
     var_index <- 1
     for (h in dir_times_rel_var1){
-      if (h > 0) {
-        edge_list_ddf[edge_index, 1] <- var_1[var_index]
-        edge_list_ddf[edge_index, 2] <- var_2[var_index]
-        edge_list_ddf[edge_index, 3] <- h
-        edge_index <- edge_index + 1
-      }
+      edge_list_ddf[edge_index, 1] <- var_1[var_index]
+      edge_list_ddf[edge_index, 2] <- var_2[var_index]
+      edge_list_ddf[edge_index, 3] <- h
+      edge_index <- edge_index + 1
       var_index <- var_index + 1
     }
 
     var_index <- 1
     for (f in dir_times_rel_var2){
-      if (f > 0) {
-        edge_list_ddf[edge_index, 1] <- var_2[var_index]
-        edge_list_ddf[edge_index, 2] <- var_1[var_index]
-        edge_list_ddf[edge_index, 3] <- f
-        edge_index <- edge_index + 1
-      }
+      edge_list_ddf[edge_index, 1] <- var_2[var_index]
+      edge_list_ddf[edge_index, 2] <- var_1[var_index]
+      edge_list_ddf[edge_index, 3] <- f
+      edge_index <- edge_index + 1
       var_index <- var_index + 1
     }
 
@@ -458,34 +452,32 @@ cld_plot <- function(topic,
     edge_index <- 1
     rel_index <- 1
     for (q in rel_sign_df$prob_causal){
-      if (q > 0) {
-        edge_list_sdf_rel[edge_index, 1] <- var_1[rel_index]
-        edge_list_sdf_rel[edge_index, 2] <- var_2[rel_index]
-        edge_list_sdf_rel[edge_index, 3] <- q
+      edge_list_sdf_rel[edge_index, 1] <- var_1[rel_index]
+      edge_list_sdf_rel[edge_index, 2] <- var_2[rel_index]
+      edge_list_sdf_rel[edge_index, 3] <- q
 
-        #add sign color to edge list
-        if (rel_sign_df$prob_pos[rel_index] > rel_sign_df$prob_neg[rel_index]) {
-          if (rel_sign_df$prob_pos[rel_index] > sign_threshold) {
-            edge_list_sdf_rel[edge_index, 4] <- "Positive"
-            edge_list_sdf_rel[edge_index, 5] <- "blue"
-          } else {
-            edge_list_sdf_rel[edge_index, 4] <- "Uncertain"
-            edge_list_sdf_rel[edge_index, 5] <- "black"
-          }
-        } else if (rel_sign_df$prob_neg[rel_index] > rel_sign_df$prob_pos[rel_index]) {
-          if (rel_sign_df$prob_neg[rel_index] > sign_threshold) {
-            edge_list_sdf_rel[edge_index, 4] <- "Negative"
-            edge_list_sdf_rel[edge_index, 5] <- "red"
-          } else {
-            edge_list_sdf_rel[edge_index, 4] <- "Uncertain"
-            edge_list_sdf_rel[edge_index, 5] <- "black"
-          }
-        } else if (rel_sign_df$prob_pos[rel_index] == rel_sign_df$prob_neg[rel_index]) {
+      #add sign color to edge list
+      if (rel_sign_df$prob_pos[rel_index] > rel_sign_df$prob_neg[rel_index]) {
+        if (rel_sign_df$prob_pos[rel_index] > sign_threshold) {
+          edge_list_sdf_rel[edge_index, 4] <- "Positive"
+          edge_list_sdf_rel[edge_index, 5] <- "blue"
+        } else {
           edge_list_sdf_rel[edge_index, 4] <- "Uncertain"
           edge_list_sdf_rel[edge_index, 5] <- "black"
         }
-        edge_index <- edge_index + 1
+      } else if (rel_sign_df$prob_neg[rel_index] > rel_sign_df$prob_pos[rel_index]) {
+        if (rel_sign_df$prob_neg[rel_index] > sign_threshold) {
+          edge_list_sdf_rel[edge_index, 4] <- "Negative"
+          edge_list_sdf_rel[edge_index, 5] <- "red"
+        } else {
+          edge_list_sdf_rel[edge_index, 4] <- "Uncertain"
+          edge_list_sdf_rel[edge_index, 5] <- "black"
+        }
+      } else if (rel_sign_df$prob_pos[rel_index] == rel_sign_df$prob_neg[rel_index]) {
+        edge_list_sdf_rel[edge_index, 4] <- "Uncertain"
+        edge_list_sdf_rel[edge_index, 5] <- "black"
       }
+      edge_index <- edge_index + 1
       rel_index <- rel_index + 1
     }
 
@@ -606,34 +598,32 @@ cld_plot <- function(topic,
     rel_index <- 1
 
     for (q in dir_times_rel_var1_S){
-      if (q > 0) {
-        edge_list_sdf_dir[edge_index, 1] <- var_1[rel_index]
-        edge_list_sdf_dir[edge_index, 2] <- var_2[rel_index]
-        edge_list_sdf_dir[edge_index, 3] <- q
+      edge_list_sdf_dir[edge_index, 1] <- var_1[rel_index]
+      edge_list_sdf_dir[edge_index, 2] <- var_2[rel_index]
+      edge_list_sdf_dir[edge_index, 3] <- q
 
-        #add sign color to edge list
-        if (dir_sign_df$prob_var1_pos[rel_index] > dir_sign_df$prob_var1_neg[rel_index]) {
-          if (dir_sign_df$prob_var1_pos[rel_index] > sign_threshold) {
-            edge_list_sdf_dir[edge_index, 4] <- "Positive"
-            edge_list_sdf_dir[edge_index, 5] <- "blue"
-          } else {
-            edge_list_sdf_dir[edge_index, 4] <- "Uncertain"
-            edge_list_sdf_dir[edge_index, 5] <- "black"
-          }
-        } else if (dir_sign_df$prob_var1_neg[rel_index] > dir_sign_df$prob_var1_pos[rel_index]) {
-          if (dir_sign_df$prob_var1_neg[rel_index] > sign_threshold) {
-            edge_list_sdf_dir[edge_index, 4] <- "Negative"
-            edge_list_sdf_dir[edge_index, 5] <- "red"
-          } else {
-            edge_list_sdf_dir[edge_index, 4] <- "Uncertain"
-            edge_list_sdf_dir[edge_index, 5] <- "black"
-          }
-        } else if (dir_sign_df$prob_var1_pos[rel_index] == dir_sign_df$prob_var1_neg[rel_index]) {
+      #add sign color to edge list
+      if (dir_sign_df$prob_var1_pos[rel_index] > dir_sign_df$prob_var1_neg[rel_index]) {
+        if (dir_sign_df$prob_var1_pos[rel_index] > sign_threshold) {
+          edge_list_sdf_dir[edge_index, 4] <- "Positive"
+          edge_list_sdf_dir[edge_index, 5] <- "blue"
+        } else {
           edge_list_sdf_dir[edge_index, 4] <- "Uncertain"
           edge_list_sdf_dir[edge_index, 5] <- "black"
         }
-        edge_index <- edge_index + 1
+      } else if (dir_sign_df$prob_var1_neg[rel_index] > dir_sign_df$prob_var1_pos[rel_index]) {
+        if (dir_sign_df$prob_var1_neg[rel_index] > sign_threshold) {
+          edge_list_sdf_dir[edge_index, 4] <- "Negative"
+          edge_list_sdf_dir[edge_index, 5] <- "red"
+        } else {
+          edge_list_sdf_dir[edge_index, 4] <- "Uncertain"
+          edge_list_sdf_dir[edge_index, 5] <- "black"
+        }
+      } else if (dir_sign_df$prob_var1_pos[rel_index] == dir_sign_df$prob_var1_neg[rel_index]) {
+        edge_list_sdf_dir[edge_index, 4] <- "Uncertain"
+        edge_list_sdf_dir[edge_index, 5] <- "black"
       }
+      edge_index <- edge_index + 1
       rel_index <- rel_index + 1
 
     }
@@ -643,34 +633,32 @@ cld_plot <- function(topic,
     rel_index <- 1
 
     for (q in dir_times_rel_var2_S) {
-      if (q > 0) {
-        edge_list_sdf_dir[edge_index, 1] <- var_2[rel_index]
-        edge_list_sdf_dir[edge_index, 2] <- var_1[rel_index]
-        edge_list_sdf_dir[edge_index, 3] <- q
+      edge_list_sdf_dir[edge_index, 1] <- var_2[rel_index]
+      edge_list_sdf_dir[edge_index, 2] <- var_1[rel_index]
+      edge_list_sdf_dir[edge_index, 3] <- q
 
-        #add sign color to edge list
-        if (dir_sign_df$prob_var2_pos[rel_index] > dir_sign_df$prob_var2_neg[rel_index]) {
-          if (dir_sign_df$prob_var2_pos[rel_index] > sign_threshold) {
-            edge_list_sdf_dir[edge_index, 4] <- "Positive"
-            edge_list_sdf_dir[edge_index, 5] <- "blue"
-          } else {
-            edge_list_sdf_dir[edge_index, 4] <- "Uncertain"
-            edge_list_sdf_dir[edge_index, 5] <- "black"
-          }
-        } else if (dir_sign_df$prob_var2_neg[rel_index] > dir_sign_df$prob_var2_pos[rel_index]) {
-          if (dir_sign_df$prob_var2_neg[rel_index] > sign_threshold) {
-            edge_list_sdf_dir[edge_index, 4] <- "Negative"
-            edge_list_sdf_dir[edge_index, 5] <- "red"
-          } else {
-            edge_list_sdf_dir[edge_index, 4] <- "Uncertain"
-            edge_list_sdf_dir[edge_index, 5] <- "black"
-          }
-        } else if (dir_sign_df$prob_var2_pos[rel_index] == dir_sign_df$prob_var2_neg[rel_index]) {
+      #add sign color to edge list
+      if (dir_sign_df$prob_var2_pos[rel_index] > dir_sign_df$prob_var2_neg[rel_index]) {
+        if (dir_sign_df$prob_var2_pos[rel_index] > sign_threshold) {
+          edge_list_sdf_dir[edge_index, 4] <- "Positive"
+          edge_list_sdf_dir[edge_index, 5] <- "blue"
+        } else {
           edge_list_sdf_dir[edge_index, 4] <- "Uncertain"
           edge_list_sdf_dir[edge_index, 5] <- "black"
         }
-        edge_index <- edge_index + 1
+      } else if (dir_sign_df$prob_var2_neg[rel_index] > dir_sign_df$prob_var2_pos[rel_index]) {
+        if (dir_sign_df$prob_var2_neg[rel_index] > sign_threshold) {
+          edge_list_sdf_dir[edge_index, 4] <- "Negative"
+          edge_list_sdf_dir[edge_index, 5] <- "red"
+        } else {
+          edge_list_sdf_dir[edge_index, 4] <- "Uncertain"
+          edge_list_sdf_dir[edge_index, 5] <- "black"
+        }
+      } else if (dir_sign_df$prob_var2_pos[rel_index] == dir_sign_df$prob_var2_neg[rel_index]) {
+        edge_list_sdf_dir[edge_index, 4] <- "Uncertain"
+        edge_list_sdf_dir[edge_index, 5] <- "black"
       }
+      edge_index <- edge_index + 1
       rel_index <- rel_index + 1
     }
 
@@ -775,3 +763,4 @@ cld_plot <- function(topic,
 
   return(output)
 }
+
