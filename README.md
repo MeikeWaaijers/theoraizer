@@ -20,9 +20,8 @@ if(!require("remotes")) {
   install.packages("remotes", dependencies = T)
 }
 
-if(!require("theoraizer")) {
-  remotes::install_github("MeikeWaaijers/theoraizer")
-}
+remotes::install_github("MeikeWaaijers/theoraizer")
+
 library(theoraizer)
 ```
 
