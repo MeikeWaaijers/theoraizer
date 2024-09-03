@@ -369,59 +369,65 @@ var_list <- function(topic,
         "Only part of the output is returned.", sep = "\n")
   })
 
-  ## LLM for limiting the final list to a list with the most ... important variables
-  if (length(variables[[1]]) > n_final) {
+  tryCatch({
+    ## LLM for limiting the final list to a list with the most ... important variables
+    if (length(variables[[1]]) > n_final) {
 
-    print(paste0("Selecting the ", n_final, " most important variables..."))
+      print(paste0("Selecting the ", n_final, " most important variables..."))
 
-    #tryCatch in case processing steps fail the raw output will still be outputted
-    tryCatch({
+      #tryCatch in case processing steps fail the raw output will still be outputted
+      tryCatch({
 
-      # Create prompt
-      prompt_limit_int <- gsub("\\((cleaned_vars)\\)", cleaned_vars,
-                               gsub("\\((n_final)\\)", n_final,
-                                    gsub("\\((topic)\\)", topic,
-                                         var_prompts$Prompt[6])))
+        # Create prompt
+        prompt_limit_int <- gsub("\\((cleaned_vars)\\)", cleaned_vars,
+                                 gsub("\\((n_final)\\)", n_final,
+                                      gsub("\\((topic)\\)", topic,
+                                           var_prompts$Prompt[6])))
 
-      # Create system prompt
-      system_prompt <- var_prompts$Sys.Prompt[6]
+        # Create system prompt
+        system_prompt <- var_prompts$Sys.Prompt[6]
 
-      # LLM
-      limit_integrated <- LLM(prompt = prompt_limit_int,
-                              LLM_model = LLM_model,
-                              max_tokens = max_tokens,
-                              temperature = 0,
-                              logprobs = TRUE,
-                              raw_output = TRUE,
-                              system_prompt = system_prompt,
-                              update_key = update_key)
+        # LLM
+        limit_integrated <- LLM(prompt = prompt_limit_int,
+                                LLM_model = LLM_model,
+                                max_tokens = max_tokens,
+                                temperature = 0,
+                                logprobs = TRUE,
+                                raw_output = TRUE,
+                                system_prompt = system_prompt,
+                                update_key = update_key)
 
-      variables_imp <- gsub("\n\n", " ", limit_integrated$output)  # remove "\n\n"  from LLM output
-      raw5_LLM <- c(prompt = prompt_limit_int, system_prompt = system_prompt, limit_integrated$raw_content)
-      logprobs5 <- limit_integrated$top5_tokens
+        variables_imp <- gsub("\n\n", " ", limit_integrated$output)  # remove "\n\n"  from LLM output
+        raw5_LLM <- c(prompt = prompt_limit_int, system_prompt = system_prompt, limit_integrated$raw_content)
+        logprobs5 <- limit_integrated$top5_tokens
 
-    }, error = function(e){
-      cat(paste0("Warning: Limiting integrated list not possible -> ", e$message, "."),
-          "Only part of the output is returned.", sep = "\n")
-    })
+      }, error = function(e){
+        cat(paste0("Warning: Limiting integrated list not possible -> ", e$message, "."),
+            "Only part of the output is returned.", sep = "\n")
+      })
 
-    #tryCatch in case processing steps fail the raw output will still be outputted
-    tryCatch({
-      #Clean the output text
-      split_text <- strsplit(variables_imp, split = "\n") # Split the string by newline character
-      variables_f <- lapply(split_text, function(x) sub("^[0-9]+\\.\\s+", "", x))
+      #tryCatch in case processing steps fail the raw output will still be outputted
+      tryCatch({
+        #Clean the output text
+        split_text <- strsplit(variables_imp, split = "\n") # Split the string by newline character
+        variables_f <- lapply(split_text, function(x) sub("^[0-9]+\\.\\s+", "", x))
 
-    }, error = function(e) {
-      cat(paste0("Warning: Unable to process LLM output -> ", e$message, "."),
-          "Only part of the output is returned.", sep = "\n")
-    })
+      }, error = function(e) {
+        cat(paste0("Warning: Unable to process LLM output -> ", e$message, "."),
+            "Only part of the output is returned.", sep = "\n")
+      })
 
-  } else {
-    variables_f <- variables
-    limit_integrated <- NULL
-    raw5_LLM <- NULL
-    logprobs5 <- NULL
-  }
+    } else {
+      variables_f <- variables
+      limit_integrated <- NULL
+      raw5_LLM <- NULL
+      logprobs5 <- NULL
+    }
+
+  }, error = function(e){
+    cat(paste0("Warning: Unable to process LLM output -> ", e$message, "."),
+        "Only part of the output is returned.", sep = "\n")
+  })
 
 
   # Initialize the output list
@@ -553,19 +559,30 @@ var_list <- function(topic,
 
   })
 
+  tryCatch({
+    # Add cleaned list to output
+    output$all_vars <- variables[[1]]
 
-  # Add cleaned list to output
-  output$all_vars <- variables[[1]]
+    # Add final_list to output
+    output$final_list <- variables_f[[1]]
 
-  # Add final_list to output
-  output$final_list <- variables_f[[1]]
+    if (length(variables[[1]]) > n_final) {
+      print("Total of LLM prompts: 6")
 
-  if (length(variables[[1]]) > n_final) {
-    print("Total of LLM prompts: 6")
+    } else {
+      print("Total of LLM prompts: 5")
 
-  } else {
-    print("Total of LLM prompts: 5")
+    }
+  }, error = function(e) {
+    cat(paste0("Warning: Unable to return raw LLM output -> ", e$message, "."),
+        "Only part of the output is returned.", sep = "\n")
 
+  })
+
+  if (length(output) == 0) {
+    stop(raw1_LLM[[1]]$error$message)
+    stop(raw1_LLM[[2]]$error$message)
+    stop(raw2_LLM$error$message)
   }
 
   return(output)
