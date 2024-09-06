@@ -127,6 +127,7 @@
 #' @import httr
 #' @import qgraph
 #' @import keyring
+#' @import shiny
 #' @export
 
 cld <- function(topic,
