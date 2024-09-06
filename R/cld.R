@@ -136,39 +136,39 @@ cld <- function(topic,
                 max_tokens = 2000,
                 update_key = FALSE) {
 
-  #validate input
-  stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
-  stopifnot("'variable_list' should be a vector containing more than one variables." = is.vector(variable_list) && length(variable_list) > 1)
-  stopifnot("All entries in 'variable_list' should be character strings." =
-              all(sapply(variable_list, is.character)))
-  stopifnot("'plot' should be a logical value." = is.logical(plot))
-  stopifnot("'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', or 'mixtral'." =
-              LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"))
-  stopifnot("For 'gpt-4o', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "gpt-4o") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
-  stopifnot("For 'gpt-4', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "gpt-4") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
-  stopifnot("For 'gpt-4-turbo', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "gpt-4-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
-  stopifnot("For 'gpt-3.5-turbo', 'max_tokens' should be a whole number above 0, and not higher than 3000." =
-              !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
-  stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." =
-              !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
-
+  # Initialize variables
   causrel <- NULL
   causdir <- NULL
   caussign <- NULL
   theoryplot <- NULL
 
+  # Validate input
+  stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
+  stopifnot("'variable_list' should be a vector containing more than one variables." = is.vector(variable_list) && length(variable_list) > 1)
+  stopifnot("All entries in 'variable_list' should be character strings." = all(sapply(variable_list, is.character)))
+  stopifnot("'plot' should be a logical value." = is.logical(plot))
+  stopifnot("'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', or 'mixtral'." = LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"))
+  stopifnot("For 'gpt-4o', 'max_tokens' should be a whole number above 0, and not higher than 6000." = !(LLM_model == "gpt-4o") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+  stopifnot("For 'gpt-4', 'max_tokens' should be a whole number above 0, and not higher than 6000." = !(LLM_model == "gpt-4") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+  stopifnot("For 'gpt-4-turbo', 'max_tokens' should be a whole number above 0, and not higher than 6000." = !(LLM_model == "gpt-4-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+  stopifnot("For 'gpt-3.5-turbo', 'max_tokens' should be a whole number above 0, and not higher than 3000." = !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
+  stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." = !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
+
+  # Check if running in Shiny
+  is_shiny <- shiny::isRunning()
+
+  # Try each function and stop if an error occurs (in Shiny mode)
   tryCatch({
     causrel <- causal_relation(topic = topic,
                                variable_list = variable_list,
                                LLM_model = LLM_model,
                                max_tokens = max_tokens)
   }, error = function(e) {
-    cat(paste0("Warning: Unable to process LLM output from relation function -> ", e$message, "."),
-        "Only part of the output is returned.", sep = "\n")
-
+    if (is_shiny) {
+      stop(paste0("Error in causal_relation: ", e$message))
+    } else {
+      cat(paste0("Warning: Unable to process LLM output from relation function -> ", e$message, "\n"))
+    }
   })
 
   tryCatch({
@@ -177,9 +177,11 @@ cld <- function(topic,
                                 LLM_model = LLM_model,
                                 max_tokens = max_tokens)
   }, error = function(e) {
-    cat(paste0("Warning: Unable to process LLM output from direction function -> ", e$message, "."),
-        "Only part of the output is returned.", sep = "\n")
-
+    if (is_shiny) {
+      stop(paste0("Error in causal_direction: ", e$message))
+    } else {
+      cat(paste0("Warning: Unable to process LLM output from direction function -> ", e$message, "\n"))
+    }
   })
 
   tryCatch({
@@ -187,21 +189,24 @@ cld <- function(topic,
                             prob_df = causdir$direction_df,
                             LLM_model = LLM_model,
                             max_tokens = max_tokens)
-
   }, error = function(e) {
-    cat(paste0("Warning: Unable to process LLM output from sign function -> ", e$message, "."),
-        "Only part of the output is returned.", sep = "\n")
-
+    if (is_shiny) {
+      stop(paste0("Error in causal_sign: ", e$message))
+    } else {
+      cat(paste0("Warning: Unable to process LLM output from sign function -> ", e$message, "\n"))
+    }
   })
 
   if (plot == TRUE) {
     tryCatch({
       theoryplot <- cld_plot(topic = topic,
                              dir_sign_df = caussign$sign_df)
-
     }, error = function(e) {
-      cat(paste0("Warning: Unable to create plot -> ", e$message, "."),
-          "Only part of the output is returned.", sep = "\n")
+      if (is_shiny) {
+        stop(paste0("Error in cld_plot: ", e$message))
+      } else {
+        cat(paste0("Warning: Unable to create plot -> ", e$message, "\n"))
+      }
     })
   }
 
@@ -213,21 +218,21 @@ cld <- function(topic,
     raw_LLM <- rbind(cbind(which_fun = "causal_relation", var = NA, causrel$raw_LLM),
                      cbind(which_fun = "causal_direction", causdir$raw_LLM),
                      cbind(which_fun = "causal_sign", caussign$raw_LLM))
-
   }, error = function(e) {
-    cat(paste0("Warning: Unable to include raw output -> ", e$message, "."),
-        "Only part of the output is returned.", sep = "\n")
-
+    if (is_shiny) {
+      stop(paste0("Error in raw LLM data processing: ", e$message))
+    } else {
+      cat(paste0("Warning: Unable to include raw output -> ", e$message, "\n"))
+    }
   })
 
   output$raw_LLM <- raw_LLM
   output$sign_df <- caussign$sign_df
 
-  if(plot == TRUE){
+  if (plot == TRUE){
     output$edge_list <- theoryplot$dir_signs_edge_list
   }
 
-
-
   return(output)
 }
+
