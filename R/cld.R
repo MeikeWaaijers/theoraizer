@@ -165,6 +165,7 @@ cld <- function(topic,
                                LLM_model = LLM_model,
                                max_tokens = max_tokens,
                                update_key = update_key)
+    update_key <- FALSE
   }, error = function(e) {
     if (is_shiny) {
       shiny::req(FALSE, paste0("Error in causal_relation: ", e$message))
