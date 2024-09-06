@@ -1087,9 +1087,58 @@ causal_sign <- function(topic,
   if (which_df == "relation") {
     print(paste0("Total of LLM prompts: ", length(row_index) * 8))
 
+    # give openai error if there is no output at all
+    if (length(output) == 0) {
+      for (i in row_index) {
+        if (!is.null(raw_LLM[[i]][[1]]$error$message)) {
+          stop(raw_LLM[[i]][[1]]$error$message)
+        } else if (!is.null(raw_LLM[[i]][[2]]$error$message)) {
+          stop(raw_LLM[[i]][[2]]$error$message)
+        } else if (!is.null(raw_LLM[[i]][[3]]$error$message)) {
+          stop(raw_LLM[[i]][[3]]$error$message)
+        } else if (!is.null(raw_LLM[[i]][[4]]$error$message)) {
+          stop(raw_LLM[[i]][[4]]$error$message)
+        } else if (!is.null(raw_LLM[[i]][[5]]$error$message)) {
+          stop(raw_LLM[[i]][[5]]$error$message)
+        } else if (!is.null(raw_LLM[[i]][[6]]$error$message)) {
+          stop(raw_LLM[[i]][[6]]$error$message)
+        } else if (!is.null(raw_LLM[[i]][[7]]$error$message)) {
+          stop(raw_LLM[[i]][[7]]$error$message)
+        } else if (!is.null(raw_LLM[[i]][[8]]$error$message)) {
+          stop(raw_LLM[[i]][[8]]$error$message)
+        }
+      }
+    }
+
   } else if (which_df == "direction") {
     print(paste0("Total of LLM prompts: ", (length(row_index_var1) * 4) + (length(row_index_var2) * 4)))
 
+    # give openai error if there is no output at all
+    if (length(output) == 0) {
+      for (i in row_index_var1) {
+        if (!is.null(raw_LLM_var1[[i]][[1]]$error$message)) {
+          stop(raw_LLM_var1[[i]][[1]]$error$message)
+        } else if (!is.null(raw_LLM_var1[[i]][[2]]$error$message)) {
+          stop(raw_LLM_var1[[i]][[2]]$error$message)
+        } else if (!is.null(raw_LLM_var1[[i]][[3]]$error$message)) {
+          stop(raw_LLM_var1[[i]][[3]]$error$message)
+        } else if (!is.null(raw_LLM_var1[[i]][[4]]$error$message)) {
+          stop(raw_LLM_var1[[i]][[4]]$error$message)
+        }
+      }
+
+      for (i in row_index_var2) {
+        if (!is.null(raw_LLM_var2[[i]][[1]]$error$message)) {
+          stop(raw_LLM_var2[[i]][[1]]$error$message)
+        } else if (!is.null(raw_LLM_var2[[i]][[2]]$error$message)) {
+          stop(raw_LLM_var2[[i]][[2]]$error$message)
+        } else if (!is.null(raw_LLM_var2[[i]][[3]]$error$message)) {
+          stop(raw_LLM_var2[[i]][[3]]$error$message)
+        } else if (!is.null(raw_LLM_var2[[i]][[4]]$error$message)) {
+          stop(raw_LLM_var2[[i]][[4]]$error$message)
+        }
+      }
+    }
   }
 
   return(output)

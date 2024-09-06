@@ -194,6 +194,7 @@ var_list <- function(topic,
 
   sys_prompt_database <- c(system_prompt1, system_prompt2)
 
+
   for (i in 1:2){
     print(paste0("Variable list: ", i,  "/", 2))
     prompt <- prompt_database[i]
@@ -214,7 +215,6 @@ var_list <- function(topic,
     raw1_LLM[[i]] <- c(prompt = prompt_database[i], system_prompt = sys_prompt_database[i], variable_list$raw_content)
     logprobs1[[i]] <- variable_list$top5_tokens
   }
-
 
   # Clean the output text
   #tryCatch in case processing steps fail the raw output will still be outputted
@@ -579,10 +579,21 @@ var_list <- function(topic,
 
   })
 
+  # give openai error if there is no output at all
   if (length(output) == 0) {
-    stop(raw1_LLM[[1]]$error$message)
-    stop(raw1_LLM[[2]]$error$message)
-    stop(raw2_LLM$error$message)
+    if (!is.null(raw1_LLM[[1]]$error$message)) {
+      stop(raw1_LLM[[1]]$error$message)
+    } else if (!is.null(raw1_LLM[[2]]$error$message)) {
+      stop(raw1_LLM[[2]]$error$message)
+    } else if (!is.null(raw2_LLM$error$message)) {
+      stop(raw2_LLM$error$message)
+    } else if (!is.null(raw3_LLM$error$message)) {
+      stop(raw3_LLM$error$message)
+    } else if (!is.null(raw4_LLM$error$message)) {
+      stop(raw4_LLM$error$message)
+    } else if (!is.null(raw5_LLM$error$message)) {
+      stop(raw5_LLM$error$message)
+    }
   }
 
   return(output)

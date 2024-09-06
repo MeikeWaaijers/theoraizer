@@ -372,5 +372,16 @@ causal_relation <- function(topic,
 
   print(paste0("Total of LLM prompts: ", n_pairs * 2))
 
+  # give openai error if there is no output at all
+  if (length(output) == 0) {
+    for (i in 1:n_pairs) {
+      if (!is.null(raw_LLM[[i]][[1]]$error$message)) {
+        stop(raw_LLM[[i]][[1]]$error$message)
+      } else if (!is.null(raw_LLM[[i]][[2]]$error$message)) {
+        stop(raw_LLM[[i]][[2]]$error$message)
+      }
+    }
+  }
+
   return(output)
 }

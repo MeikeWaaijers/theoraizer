@@ -575,8 +575,22 @@ causal_direction <- function(topic,
   # Adding relation_df to output
   output$direction_df <- direction_df
 
-
   print(paste0("Total of LLM prompts: ", n_causal_rela * 4))
+
+  # give openai error if there is no output at all
+  if (length(output) == 0) {
+    for (i in row_index) {
+      if (!is.null(raw_LLM_var1[[i]][[1]]$error$message)) {
+        stop(raw_LLM_var1[[i]][[1]]$error$message)
+      } else if (!is.null(raw_LLM_var1[[i]][[2]]$error$message)) {
+        stop(raw_LLM_var1[[i]][[2]]$error$message)
+      } else if (!is.null(raw_LLM_var2[[i]][[1]]$error$message)) {
+        stop(raw_LLM_var2[[i]][[1]]$error$message)
+      } else if (!is.null(raw_LLM_var2[[i]][[2]]$error$message)) {
+        stop(raw_LLM_var2[[i]][[2]]$error$message)
+      }
+    }
+  }
 
   return(output)
 }
