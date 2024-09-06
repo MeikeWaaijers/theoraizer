@@ -129,7 +129,7 @@ var_list <- function(topic,
               !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
   stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." =
               !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
-
+  stopifnot("'update_key' should be a logical value." = is.logical(update_key))
 
   ## Load and prepare prompt data
   prompt_file_path <- system.file("extdata", "prompts.csv", package = "theoraizer")
@@ -210,7 +210,7 @@ var_list <- function(topic,
                          system_prompt = system_prompt,
                          update_key = update_key)
 
-
+    update_key <- FALSE # make sure api key is only updated once
     runs[[i]] <- variable_list$output
     raw1_LLM[[i]] <- c(prompt = prompt_database[i], system_prompt = sys_prompt_database[i], variable_list$raw_content)
     logprobs1[[i]] <- variable_list$top5_tokens

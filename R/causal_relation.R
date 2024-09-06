@@ -124,7 +124,7 @@ causal_relation <- function(topic,
               !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
   stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." =
               !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
-
+  stopifnot("'update_key' should be a logical value." = is.logical(update_key))
 
   ## Load and prepare prompt data
   prompt_file_path <- system.file("extdata", "prompts.csv", package = "theoraizer")
@@ -226,7 +226,7 @@ causal_relation <- function(topic,
                         system_prompt = system_prompt,
                         update_key = update_key)
 
-
+      update_key <- FALSE # make sure api key is only updated once
       raw_LLM_prompt[[g]] <- c(prompt = prompt, system_prompt = system_prompt, LLM_output$raw_content)
       logprobs_LLM_prompt[[g]] <- LLM_output$top5_tokens
     }

@@ -163,7 +163,8 @@ cld <- function(topic,
     causrel <- causal_relation(topic = topic,
                                variable_list = variable_list,
                                LLM_model = LLM_model,
-                               max_tokens = max_tokens)
+                               max_tokens = max_tokens,
+                               update_key = update_key)
   }, error = function(e) {
     if (is_shiny) {
       shiny::req(FALSE, paste0("Error in causal_relation: ", e$message))
@@ -177,7 +178,8 @@ cld <- function(topic,
     causdir <- causal_direction(topic = topic,
                                 relation_df = causrel$relation_df,
                                 LLM_model = LLM_model,
-                                max_tokens = max_tokens)
+                                max_tokens = max_tokens,
+                                update_key = update_key)
   }, error = function(e) {
     if (is_shiny) {
       shiny::req(FALSE, paste0("Error in causal_direction: ", e$message))
@@ -191,7 +193,8 @@ cld <- function(topic,
     caussign <- causal_sign(topic = topic,
                             prob_df = causdir$direction_df,
                             LLM_model = LLM_model,
-                            max_tokens = max_tokens)
+                            max_tokens = max_tokens,
+                            update_key = update_key)
   }, error = function(e) {
     if (is_shiny) {
       shiny::req(FALSE, paste0("Error in causal_sign: ", e$message))

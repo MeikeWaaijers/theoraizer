@@ -217,7 +217,7 @@ causal_sign <- function(topic,
               !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
   stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." =
               !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
-
+  stopifnot("'update_key' should be a logical value." = is.logical(update_key))
 
   ## Load and prepare prompt data
   prompt_file_path <- system.file("extdata", "prompts.csv", package = "theoraizer")
@@ -376,6 +376,7 @@ causal_sign <- function(topic,
                        system_prompt = system_prompt,
                        update_key = update_key)
 
+        update_key <- FALSE # make sure api key is only updated once
         raw_posneg[c] <- list(c(prompt = prompt, system_prompt = system_prompt, pos_neg$raw_content))
         logprobs_posneg[c] <- list(pos_neg$top5_tokens)
 
@@ -609,6 +610,7 @@ causal_sign <- function(topic,
                             system_prompt = var1_system_prompt,
                             update_key = update_key)
 
+        update_key <- FALSE # make sure api key is only updated once
         raw_posneg_var1[g] <- list(c(prompt = var1_prompt, system_prompt = var1_system_prompt, var1_pos_neg$raw_content))
         logprobs_posneg_var1[g] <- list(var1_pos_neg$top5_tokens)
 
@@ -713,7 +715,7 @@ causal_sign <- function(topic,
                             system_prompt = var2_system_prompt,
                             update_key = update_key)
 
-
+        update_key <- FALSE # make sure api key is only updated once
         raw_posneg_var2[k] <- list(c(prompt = var2_prompt, system_prompt = var2_system_prompt, var2_pos_neg$raw_content))
         logprobs_posneg_var2[k] <- list(var2_pos_neg$top5_tokens)
 
