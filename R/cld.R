@@ -137,11 +137,8 @@ cld <- function(topic,
                 max_tokens = 2000,
                 update_key = FALSE) {
 
-  # Initialize variables
-  causrel <- NULL
-  causdir <- NULL
-  caussign <- NULL
-  theoryplot <- NULL
+  # Check if running in Shiny
+  is_shiny <- shiny::isRunning()
 
   # Validate input
   stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
@@ -155,10 +152,13 @@ cld <- function(topic,
   stopifnot("For 'gpt-3.5-turbo', 'max_tokens' should be a whole number above 0, and not higher than 3000." = !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
   stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." = !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
 
-  # Check if running in Shiny
-  is_shiny <- shiny::isRunning()
+  # Initialize variables
+  causrel <- NULL
+  causdir <- NULL
+  caussign <- NULL
+  theoryplot <- NULL
 
-  # Try each function and stop if an error occurs (in Shiny mode)
+  # Step 1: causal_relation
   tryCatch({
     causrel <- causal_relation(topic = topic,
                                variable_list = variable_list,
@@ -166,12 +166,13 @@ cld <- function(topic,
                                max_tokens = max_tokens)
   }, error = function(e) {
     if (is_shiny) {
-      stop(paste0("Error in causal_relation: ", e$message))
+      shiny::req(FALSE, paste0("Error in causal_relation: ", e$message))
     } else {
-      cat(paste0("Warning: Unable to process LLM output from relation function -> ", e$message, "\n"))
+      stop(paste0("Error in causal_relation: ", e$message))
     }
   })
 
+  # Step 2: causal_direction
   tryCatch({
     causdir <- causal_direction(topic = topic,
                                 relation_df = causrel$relation_df,
@@ -179,12 +180,13 @@ cld <- function(topic,
                                 max_tokens = max_tokens)
   }, error = function(e) {
     if (is_shiny) {
-      stop(paste0("Error in causal_direction: ", e$message))
+      shiny::req(FALSE, paste0("Error in causal_direction: ", e$message))
     } else {
-      cat(paste0("Warning: Unable to process LLM output from direction function -> ", e$message, "\n"))
+      stop(paste0("Error in causal_direction: ", e$message))
     }
   })
 
+  # Step 3: causal_sign
   tryCatch({
     caussign <- causal_sign(topic = topic,
                             prob_df = causdir$direction_df,
@@ -192,21 +194,22 @@ cld <- function(topic,
                             max_tokens = max_tokens)
   }, error = function(e) {
     if (is_shiny) {
-      stop(paste0("Error in causal_sign: ", e$message))
+      shiny::req(FALSE, paste0("Error in causal_sign: ", e$message))
     } else {
-      cat(paste0("Warning: Unable to process LLM output from sign function -> ", e$message, "\n"))
+      stop(paste0("Error in causal_sign: ", e$message))
     }
   })
 
+  # Step 4: cld_plot (optional)
   if (plot == TRUE) {
     tryCatch({
       theoryplot <- cld_plot(topic = topic,
                              dir_sign_df = caussign$sign_df)
     }, error = function(e) {
       if (is_shiny) {
-        stop(paste0("Error in cld_plot: ", e$message))
+        shiny::req(FALSE, paste0("Error in cld_plot: ", e$message))
       } else {
-        cat(paste0("Warning: Unable to create plot -> ", e$message, "\n"))
+        stop(paste0("Error in cld_plot: ", e$message))
       }
     })
   }
@@ -215,15 +218,14 @@ cld <- function(topic,
   output <- list()
   raw_LLM <- NULL
   tryCatch({
-    # Add raw dataframes to output
     raw_LLM <- rbind(cbind(which_fun = "causal_relation", var = NA, causrel$raw_LLM),
                      cbind(which_fun = "causal_direction", causdir$raw_LLM),
                      cbind(which_fun = "causal_sign", caussign$raw_LLM))
   }, error = function(e) {
     if (is_shiny) {
-      stop(paste0("Error in raw LLM data processing: ", e$message))
+      shiny::req(FALSE, paste0("Error in raw LLM data processing: ", e$message))
     } else {
-      cat(paste0("Warning: Unable to include raw output -> ", e$message, "\n"))
+      stop(paste0("Error in raw LLM data processing: ", e$message))
     }
   })
 
@@ -236,4 +238,3 @@ cld <- function(topic,
 
   return(output)
 }
-
