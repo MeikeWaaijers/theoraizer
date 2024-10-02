@@ -466,8 +466,8 @@ causal_sign <- function(topic,
             }
           }
         }
-        pos_prob_f[w] <- round((pos_prob_t / 8), 2)
-        neg_prob_f[w] <- round((neg_prob_t / 8), 2)
+        pos_prob_f[w] <- ifelse((pos_prob_t / 8) > 100, round((pos_prob_t / 8)), round((pos_prob_t / 8), 2))
+        neg_prob_f[w] <- ifelse((neg_prob_t / 8) > 100, round((neg_prob_t / 8)), round((neg_prob_t / 8), 2))
       }
 
       #replace absent relations with 0
@@ -874,8 +874,8 @@ causal_sign <- function(topic,
             }
           }
         }
-        var1_pos_prob_f[w] <- round((var1_pos_prob_t / 4), 2)
-        var1_neg_prob_f[w] <- round((var1_neg_prob_t / 4), 2)
+        var1_pos_prob_f[w] <- ifelse((var1_pos_prob_t / 4) > 100, round((var1_pos_prob_t / 4)), round((var1_pos_prob_t / 4), 2))
+        var1_neg_prob_f[w] <- ifelse((var1_neg_prob_t / 4) > 100, round((var1_neg_prob_t / 4)), round((var1_neg_prob_t / 4), 2))
       }
 
       #var2
@@ -893,8 +893,8 @@ causal_sign <- function(topic,
             }
           }
         }
-        var2_pos_prob_f[w] <- round((var2_pos_prob_t / 4), 2)
-        var2_neg_prob_f[w] <- round((var2_neg_prob_t / 4), 2)
+        var2_pos_prob_f[w] <- ifelse((var2_pos_prob_t / 4) > 100, round((var2_pos_prob_t / 4)), round((var2_pos_prob_t / 4), 2))
+        var2_neg_prob_f[w] <- ifelse((var2_neg_prob_t / 4) > 100, round((var2_neg_prob_t / 4)), round((var2_neg_prob_t / 4), 2))
       }
 
 

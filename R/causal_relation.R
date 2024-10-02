@@ -304,7 +304,7 @@ causal_relation <- function(topic,
           }
         }
       }
-      c_class[i] <- round(max(c_class_t), 2)
+      c_class[i] <- ifelse(max(c_class_t) > 100, round(max(c_class_t)), round(max(c_class_t), 2))
     }
 
     # replace na's with 0

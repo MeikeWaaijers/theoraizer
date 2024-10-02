@@ -454,8 +454,8 @@ causal_direction <- function(topic,
           }
         }
       }
-      var1_prob_f[w] <- round((var1_prob_t / 2), 2)
-      var2_prob_f[w] <- round((var2_prob_t / 2), 2)
+      var1_prob_f[w] <- ifelse((var1_prob_t / 2) > 100, round((var1_prob_t / 2)), round((var1_prob_t / 2), 2))
+      var2_prob_f[w] <- ifelse((var2_prob_t / 2) > 100, round((var2_prob_t / 2)), round((var2_prob_t / 2), 2))
     }
 
     #replace absent relations with 0
