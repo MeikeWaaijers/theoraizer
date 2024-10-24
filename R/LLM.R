@@ -37,16 +37,16 @@ LLM <- function(prompt = prompt,
                 update_key = update_key){
 
   if (LLM_model == "mixtral") {
-    api_key <- get_api_key("anyscale",
+    api_key <- get_api_key("huggingface",
                            update_key = update_key)
 
     # API endpoint
-    endpoint <- "https://api.endpoints.anyscale.com/v1/chat/completions"
+    endpoint <- "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions"
 
     if (logprobs == TRUE) {
       # Request body
       request_body <- list(model = "mistralai/Mixtral-8x7B-Instruct-v0.1",
-                           max_new_tokens = max_tokens,
+                           max_tokens = max_tokens,
                            messages = list(
                              list("role" = "system", "content" = system_prompt),
                              list("role" = "user", "content" = prompt)
