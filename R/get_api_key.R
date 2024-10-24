@@ -48,8 +48,8 @@ get_api_key <- function(service_name, update_key = FALSE) {
   if (!ci && !shinyapps && (update_key || nrow(keyring::key_list(service = service_name)) == 0)) {
     cat("To use this functionality, an API key needs to be set.\n")
     cat("Please follow these steps to resolve the issue:\n")
-    if (service_name == "anyscale") {
-      cat("1. Create an API key on https://app.endpoints.anyscale.com/credentials \n")
+    if (service_name == "huggingface") {
+      cat("1. Create an API key on https://huggingface.co/settings/tokens \n")
     } else if (service_name == "openai") {
       cat("1. Create an API key on https://platform.openai.com/account/api-keys \n")
     }
