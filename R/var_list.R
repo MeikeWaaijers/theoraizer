@@ -224,7 +224,7 @@ var_list <- function(topic,
     for (k in 1:2){
       split_text[k] <- strsplit(runs[[k]], split = "\n") # Split the string by newline character
     }
-    all_lists <- lapply(split_text, function(x) sub("^[0-9]+\\.\\s+", "", x))
+    all_lists <- lapply(split_text, function(x) sub("^\\s*[0-9]+\\.\\s+", "", x))
 
     # Get list lengths
     list_length <- NULL
@@ -362,7 +362,7 @@ var_list <- function(topic,
 
     #Clean the output text
     split_text <- strsplit(cleaned_vars, split = "\n") # Split the string by newline character
-    variables <- lapply(split_text, function(x) sub("^[0-9]+\\.\\s+", "", x))
+    variables <- lapply(split_text, function(x) sub("^\\s*[0-9]+\\.\\s+", "", x))
 
   }, error = function(e) {
     cat(paste0("Warning: Unable to process LLM output -> ", e$message, "."),
@@ -410,7 +410,7 @@ var_list <- function(topic,
       tryCatch({
         #Clean the output text
         split_text <- strsplit(variables_imp, split = "\n") # Split the string by newline character
-        variables_f <- lapply(split_text, function(x) sub("^[0-9]+\\.\\s+", "", x))
+        variables_f <- lapply(split_text, function(x) sub("^\\s*[0-9]+\\.\\s+", "", x))
 
       }, error = function(e) {
         cat(paste0("Warning: Unable to process LLM output -> ", e$message, "."),
