@@ -39,7 +39,8 @@
 #'          sign_threshold = 50,
 #'          plot = TRUE,
 #'          layout = "average",
-#'          legend = TRUE)
+#'          legend = TRUE,
+#'          not_plot = FALSE)
 #' @details
 #' to create a fully fledged theory from scratch, the functions in this R-packaged should be used in the following order:
 #'
@@ -58,6 +59,7 @@
 #' @param plot If \code{plot = TRUE} (default), the function will generate network plot(s) visualizing the edge list(s). If \code{plot = FALSE} only the edge list will be created but it will not be visualized.
 #' @param layout This argument controls the layout of the plot and is very similar to the \code{layout} argument of the \code{\link[qgraph]{qgraph}} package. If \code{layout = "average"} and multiple dataframes are inputted, all nodes will be placed in a joint layout (see \code{\link[qgraph:averageLayout]{averageLayout}}). If \code{layout = "average"} and only one dataframe is inputted, the plot will default to a force-embedded layout (same as the "spring" layout in the \code{\link[qgraph]{qgraph}} package). If \code{layout = "circle"}, all nodes will be placed in a single circle (see \code{\link[qgraph]{qgraph}}).
 #' @param legend If \code{legend = TRUE} (default), the network plot(s) will include a legend. If variable names are extremely long, it may be advisable to set the legend argument to FALSE to maintain plot readability.
+#' @param not_plot If \code{not_plot = TRUE}, the function will generate network plot(s) that visualize edges that fall below a specified threshold (either the \code{relation_threshold}, \code{direction_threshold}, or \code{combine_threshold}, depending on the input dataframe and the \code{combine} argument). This effectively visualizes the relationships that are considered to be non-causal.
 #'
 #' @returns
 #' Either one, two, three, or four edge lists depending on how many probability dataframes were inputted:
@@ -157,6 +159,12 @@
 #'                               dir_sign_df = dir_sign$sign_df,
 #'                               combine = TRUE,
 #'                               combine_threshold = 80)
+#'
+#' #---------------------------------------------------------------------------
+#' ## Create a NOT plot for a relation dataframe
+#' not <- cld_plot(topic = "addiction",
+#'                         relation_df = rel$relation_df,
+#'                         not_plot = TRUE)
 #' }
 #' @import qgraph
 #' @export
@@ -175,7 +183,8 @@ cld_plot <- function(topic,
                      sign_threshold = 50,
                      plot = TRUE,
                      layout = "average",
-                     legend = TRUE){
+                     legend = TRUE,
+                     not_plot = FALSE) {
 
   #validate input
   stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
@@ -196,6 +205,7 @@ cld_plot <- function(topic,
     stopifnot("'legend' can only be set to TRUE if 'plot' is also set to TRUE." = plot == TRUE)
   }
 
+  stopifnot("'not_plot' should be a logical value." = is.logical(not_plot))
 
   # Create topic for title
   if (is.null(topic)) {
@@ -229,7 +239,7 @@ cld_plot <- function(topic,
     edge_list_cdf <- data.frame()
     edge_index <- 1
     var_index <- 1
-    for (y in relation_df$prob_causal){
+    for (y in relation_df$prob_causal) {
       edge_list_cdf[edge_index, 1] <- var_1[var_index]
       edge_list_cdf[edge_index, 2] <- var_2[var_index]
       edge_list_cdf[edge_index, 3] <- y
@@ -271,31 +281,64 @@ cld_plot <- function(topic,
         edge_list_cdf2$to[edge_list_cdf2$to == i] <- node_df$nn[node_df$Variables == i]
       }
 
-      p.cdf <- qgraph::qgraph(edge_list_cdf2,
-                              edge.color = "black",
-                              threshold = relation_threshold,
-                              fade = TRUE,
-                              maximum = 100,
-                              minimum = 0,
-                              vsize = 5,
-                              esize = 2,
-                              labels = node_df[,2],
-                              nodeNames = node_df[,1],
-                              legend = legend,
-                              legend.cex = 0.4,
-                              legend.mode = "names",
-                              GLratio = 2,
-                              title = paste0("Causal relation plot: ", topic),
-                              title.cex = 1.2,
-                              directed = TRUE,
-                              bidirectional = TRUE,
-                              arrows =  FALSE,
-                              DoNotPlot = TRUE)
+      if (not_plot) {
+
+        not <- edge_list_cdf2
+        not_index <- which(not$weight <= relation_threshold)
+        yes_index <- which(not$weight > relation_threshold)
+        not$weight[not_index] <- 100
+        not$weight[yes_index] <- 0
+
+        p.cdf <- qgraph::qgraph(not,
+                                edge.color = "black",
+                                threshold = relation_threshold,
+                                fade = TRUE,
+                                maximum = 100,
+                                minimum = 0,
+                                vsize = 5,
+                                esize = 2,
+                                labels = node_df[,2],
+                                nodeNames = node_df[,1],
+                                legend = legend,
+                                legend.cex = 0.4,
+                                legend.mode = "names",
+                                GLratio = 2,
+                                title = paste0("NOT plot (causal relations): ", topic),
+                                title.cex = 1.2,
+                                directed = TRUE,
+                                bidirectional = TRUE,
+                                arrows =  FALSE,
+                                DoNotPlot = TRUE)
+
+        edge_list_cdf$NOT_weight <- not$weight
 
 
+      } else if (!not_plot) {
+        p.cdf <- qgraph::qgraph(edge_list_cdf2,
+                                edge.color = "black",
+                                threshold = relation_threshold,
+                                fade = TRUE,
+                                maximum = 100,
+                                minimum = 0,
+                                vsize = 5,
+                                esize = 2,
+                                labels = node_df[,2],
+                                nodeNames = node_df[,1],
+                                legend = legend,
+                                legend.cex = 0.4,
+                                legend.mode = "names",
+                                GLratio = 2,
+                                title = paste0("Causal relation plot: ", topic),
+                                title.cex = 1.2,
+                                directed = TRUE,
+                                bidirectional = TRUE,
+                                arrows =  FALSE,
+                                DoNotPlot = TRUE)
+
+      }
     }
 
-    output <- c(output, list(rel_edge_list = edge_list_cdf[which(edge_list_cdf[,3]!= 0),]))
+    output <- c(output, list(rel_edge_list = edge_list_cdf))
 
   }
 
@@ -346,7 +389,7 @@ cld_plot <- function(topic,
     edge_list_ddf <- data.frame()
     edge_index <- 1
     var_index <- 1
-    for (h in dir_times_rel_var1){
+    for (h in dir_times_rel_var1) {
       edge_list_ddf[edge_index, 1] <- var_1[var_index]
       edge_list_ddf[edge_index, 2] <- var_2[var_index]
       edge_list_ddf[edge_index, 3] <- h
@@ -355,7 +398,7 @@ cld_plot <- function(topic,
     }
 
     var_index <- 1
-    for (f in dir_times_rel_var2){
+    for (f in dir_times_rel_var2) {
       edge_list_ddf[edge_index, 1] <- var_2[var_index]
       edge_list_ddf[edge_index, 2] <- var_1[var_index]
       edge_list_ddf[edge_index, 3] <- f
@@ -397,29 +440,63 @@ cld_plot <- function(topic,
         threshold <- direction_threshold
       }
 
-      p.ddf <- qgraph::qgraph(edge_list_ddf2,
-                              threshold = threshold,
-                              edge.color = "black",
-                              fade = TRUE,
-                              maximum = 100,
-                              minimum = 0,
-                              vsize = 5,
-                              esize = 2,
-                              labels = node_df[,2],
-                              nodeNames = node_df[,1],
-                              legend = legend,
-                              legend.cex = 0.4,
-                              legend.mode = "names",
-                              GLratio = 2,
-                              title = ifelse(combine,
-                                             paste0("Causal combined plot: ", topic),
-                                             paste0("Causal direction plot: ", topic)),
-                              title.cex = 1.2,
-                              DoNotPlot = TRUE)
+      if (not_plot) {
 
+        not <- edge_list_ddf2
+        not_index <- which(not$weight <= threshold)
+        yes_index <- which(not$weight > threshold)
+        not$weight[not_index] <- 100
+        not$weight[yes_index] <- 0
+
+        p.ddf <- qgraph::qgraph(not,
+                                threshold = threshold,
+                                edge.color = "black",
+                                fade = TRUE,
+                                maximum = 100,
+                                minimum = 0,
+                                vsize = 5,
+                                esize = 2,
+                                labels = node_df[,2],
+                                nodeNames = node_df[,1],
+                                legend = legend,
+                                legend.cex = 0.4,
+                                legend.mode = "names",
+                                GLratio = 2,
+                                title = ifelse(combine,
+                                               paste0("NOT plot (causal combined): ", topic),
+                                               paste0("NOT plot (causal direction): ", topic)),
+                                title.cex = 1.2,
+                                DoNotPlot = TRUE)
+
+        edge_list_ddf$NOT_weight <- not$weight
+
+
+      } else if (!not_plot) {
+
+        p.ddf <- qgraph::qgraph(edge_list_ddf2,
+                                threshold = threshold,
+                                edge.color = "black",
+                                fade = TRUE,
+                                maximum = 100,
+                                minimum = 0,
+                                vsize = 5,
+                                esize = 2,
+                                labels = node_df[,2],
+                                nodeNames = node_df[,1],
+                                legend = legend,
+                                legend.cex = 0.4,
+                                legend.mode = "names",
+                                GLratio = 2,
+                                title = ifelse(combine,
+                                               paste0("Causal combined plot: ", topic),
+                                               paste0("Causal direction plot: ", topic)),
+                                title.cex = 1.2,
+                                DoNotPlot = TRUE)
+
+      }
     }
 
-    output <- c(output, list(dir_edge_list = edge_list_ddf[which(edge_list_ddf[,3]!= 0),]))
+    output <- c(output, list(dir_edge_list = edge_list_ddf))
 
   }
 
@@ -513,29 +590,65 @@ cld_plot <- function(topic,
         edge_list_sdf_rel2$to[edge_list_sdf_rel2$to == i] <- node_df$nn[node_df$Variables == i]
       }
 
-      p.sdf_rel <- qgraph::qgraph(edge_list_sdf_rel2[,1:3],
-                                  threshold = relation_threshold,
-                                  edge.color = edge_list_sdf_rel2[,5],
-                                  fade = TRUE,
-                                  maximum = 100,
-                                  minimum = 0,
-                                  vsize = 5,
-                                  esize = 2,
-                                  labels = node_df[,2],
-                                  nodeNames = node_df[,1],
-                                  legend = legend,
-                                  legend.cex = 0.4,
-                                  legend.mode = "names",
-                                  GLratio = 2,
-                                  title = paste0("Causal relation & sign plot: ", topic),
-                                  title.cex = 1.2,
-                                  directed = TRUE,
-                                  bidirectional = TRUE,
-                                  arrows =  FALSE,
-                                  DoNotPlot = TRUE)
+      if (not_plot) {
 
+        not <- edge_list_sdf_rel2
+        not_index <- which(not$weight <= relation_threshold)
+        yes_index <- which(not$weight > relation_threshold)
+        not$weight[not_index] <- 100
+        not$weight[yes_index] <- 0
+
+        p.sdf_rel <- qgraph::qgraph(not[,1:3],
+                                    edge.color = "black",
+                                    threshold = relation_threshold,
+                                    fade = TRUE,
+                                    maximum = 100,
+                                    minimum = 0,
+                                    vsize = 5,
+                                    esize = 2,
+                                    labels = node_df[,2],
+                                    nodeNames = node_df[,1],
+                                    legend = legend,
+                                    legend.cex = 0.4,
+                                    legend.mode = "names",
+                                    GLratio = 2,
+                                    title = paste0("NOT plot (causal relations & sign): ", topic),
+                                    title.cex = 1.2,
+                                    directed = TRUE,
+                                    bidirectional = TRUE,
+                                    arrows =  FALSE,
+                                    DoNotPlot = TRUE)
+
+        edge_list_sdf_rel$NOT_weight <- not$weight
+        edge_list_sdf_rel <- edge_list_sdf_rel[,c(1:4,6,5)]
+
+      } else if (!not_plot) {
+
+        p.sdf_rel <- qgraph::qgraph(edge_list_sdf_rel2[,1:3],
+                                    threshold = relation_threshold,
+                                    edge.color = edge_list_sdf_rel2[,5],
+                                    fade = TRUE,
+                                    maximum = 100,
+                                    minimum = 0,
+                                    vsize = 5,
+                                    esize = 2,
+                                    labels = node_df[,2],
+                                    nodeNames = node_df[,1],
+                                    legend = legend,
+                                    legend.cex = 0.4,
+                                    legend.mode = "names",
+                                    GLratio = 2,
+                                    title = paste0("Causal relation & sign plot: ", topic),
+                                    title.cex = 1.2,
+                                    directed = TRUE,
+                                    bidirectional = TRUE,
+                                    arrows =  FALSE,
+                                    DoNotPlot = TRUE)
+
+      }
     }
-    output <- c(output, list(rel_sign_edge_list = edge_list_sdf_rel[which(edge_list_sdf_rel[,3]!= 0), 1:4]))
+
+    output <- c(output, list(rel_sign_edge_list = edge_list_sdf_rel[, 1:5]))
 
   }
 
@@ -683,7 +796,7 @@ cld_plot <- function(topic,
     colnames(edge_list_sdf_dir) <- c("from", "to", "weight", "sign", "color")
 
 
-    if(plot) {
+    if (plot) {
       #create plot object for output
       node_df <- data.frame(Variables = all_vars, nn = 1:length(all_vars))
 
@@ -703,29 +816,62 @@ cld_plot <- function(topic,
         threshold <- direction_threshold
       }
 
+      if (not_plot) {
 
-      p.sdf_dir <- qgraph::qgraph(edge_list_sdf_dir2[,1:3],
-                                  threshold = threshold,
-                                  edge.color = edge_list_sdf_dir2[,5],
-                                  fade = TRUE,
-                                  maximum = 100,
-                                  minimum = 0,
-                                  vsize = 5,
-                                  esize = 2,
-                                  labels = node_df[,2],
-                                  nodeNames = node_df[,1],
-                                  legend = legend,
-                                  legend.cex = 0.4,
-                                  legend.mode = "names",
-                                  GLratio = 2,
-                                  title = ifelse(combine,
-                                                 paste0("Causal combined & sign plot: ", topic),
-                                                 paste0("Causal direction & sign plot: ", topic)),
-                                  title.cex = 1.2,
-                                  DoNotPlot = TRUE)
+        not <- edge_list_sdf_dir2
+        not_index <- which(not$weight <= threshold)
+        yes_index <- which(not$weight > threshold)
+        not$weight[not_index] <- 100
+        not$weight[yes_index] <- 0
+
+        p.sdf_dir <- qgraph::qgraph(not[,1:3],
+                                    threshold = threshold,
+                                    edge.color = "black",
+                                    fade = TRUE,
+                                    maximum = 100,
+                                    minimum = 0,
+                                    vsize = 5,
+                                    esize = 2,
+                                    labels = node_df[,2],
+                                    nodeNames = node_df[,1],
+                                    legend = legend,
+                                    legend.cex = 0.4,
+                                    legend.mode = "names",
+                                    GLratio = 2,
+                                    title = ifelse(combine,
+                                                   paste0("NOT plot (causal combined & sign): ", topic),
+                                                   paste0("NOT plot (causal direction & sign): ", topic)),
+                                    title.cex = 1.2,
+                                    DoNotPlot = TRUE)
+
+        edge_list_sdf_dir$NOT_weight <- not$weight
+        edge_list_sdf_dir <- edge_list_sdf_dir[,c(1:4,6,5)]
+
+      } else if (!not_plot) {
+
+        p.sdf_dir <- qgraph::qgraph(edge_list_sdf_dir2[,1:3],
+                                    threshold = threshold,
+                                    edge.color = edge_list_sdf_dir2[,5],
+                                    fade = TRUE,
+                                    maximum = 100,
+                                    minimum = 0,
+                                    vsize = 5,
+                                    esize = 2,
+                                    labels = node_df[,2],
+                                    nodeNames = node_df[,1],
+                                    legend = legend,
+                                    legend.cex = 0.4,
+                                    legend.mode = "names",
+                                    GLratio = 2,
+                                    title = ifelse(combine,
+                                                   paste0("Causal combined & sign plot: ", topic),
+                                                   paste0("Causal direction & sign plot: ", topic)),
+                                    title.cex = 1.2,
+                                    DoNotPlot = TRUE)
+      }
     }
 
-    output <- c(output, list(dir_sign_edge_list = edge_list_sdf_dir[which(edge_list_sdf_dir[,3]!= 0), 1:4]))
+    output <- c(output, list(dir_sign_edge_list = edge_list_sdf_dir[, 1:5]))
 
   }
 

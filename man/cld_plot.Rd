@@ -16,7 +16,8 @@ cld_plot(topic,
          sign_threshold = 50,
          plot = TRUE,
          layout = "average",
-         legend = TRUE)
+         legend = TRUE,
+         not_plot = FALSE)
 }
 \arguments{
 \item{topic}{A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.}
@@ -44,6 +45,8 @@ cld_plot(topic,
 \item{layout}{This argument controls the layout of the plot and is very similar to the \code{layout} argument of the \code{\link[qgraph]{qgraph}} package. If \code{layout = "average"} and multiple dataframes are inputted, all nodes will be placed in a joint layout (see \code{\link[qgraph:averageLayout]{averageLayout}}). If \code{layout = "average"} and only one dataframe is inputted, the plot will default to a force-embedded layout (same as the "spring" layout in the \code{\link[qgraph]{qgraph}} package). If \code{layout = "circle"}, all nodes will be placed in a single circle (see \code{\link[qgraph]{qgraph}}).}
 
 \item{legend}{If \code{legend = TRUE} (default), the network plot(s) will include a legend. If variable names are extremely long, it may be advisable to set the legend argument to FALSE to maintain plot readability.}
+
+\item{not_plot}{If \code{not_plot = TRUE}, the function will generate network plot(s) that visualize edges that fall below a specified threshold (either the \code{relation_threshold}, \code{direction_threshold}, or \code{combine_threshold}, depending on the input dataframe and the \code{combine} argument). This effectively visualizes the relationships that are considered to be non-causal.}
 }
 \value{
 Either one, two, three, or four edge lists depending on how many probability dataframes were inputted:
@@ -140,6 +143,12 @@ combine_edge_list <- cld_plot(topic = "addiction",
                               dir_sign_df = dir_sign$sign_df,
                               combine = TRUE,
                               combine_threshold = 80)
+
+#---------------------------------------------------------------------------
+## Create a NOT plot for a relation dataframe
+not <- cld_plot(topic = "addiction",
+                        relation_df = rel$relation_df,
+                        not_plot = TRUE)
 }
 }
 \references{
