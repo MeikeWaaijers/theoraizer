@@ -311,7 +311,7 @@ cld_plot <- function(topic,
                                 title.cex = 1.2,
                                 directed = TRUE,
                                 bidirectional = TRUE,
-                                arrows =  FALSE,
+                                arrows = FALSE,
                                 DoNotPlot = TRUE)
 
         edge_list_cdf$NOT_weight <- not$weight
@@ -336,7 +336,7 @@ cld_plot <- function(topic,
                                 title.cex = 1.2,
                                 directed = TRUE,
                                 bidirectional = TRUE,
-                                arrows =  FALSE,
+                                arrows = FALSE,
                                 DoNotPlot = TRUE)
 
       }
@@ -620,7 +620,7 @@ cld_plot <- function(topic,
                                     title.cex = 1.2,
                                     directed = TRUE,
                                     bidirectional = TRUE,
-                                    arrows =  FALSE,
+                                    arrows = FALSE,
                                     DoNotPlot = TRUE)
 
         edge_list_sdf_rel$NOT_weight <- not$weight
@@ -646,7 +646,7 @@ cld_plot <- function(topic,
                                     title.cex = 1.2,
                                     directed = TRUE,
                                     bidirectional = TRUE,
-                                    arrows =  FALSE,
+                                    arrows = FALSE,
                                     DoNotPlot = TRUE)
 
       }
