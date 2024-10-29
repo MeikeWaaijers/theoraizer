@@ -46,7 +46,7 @@ cld_plot(topic,
 
 \item{legend}{If \code{legend = TRUE} (default), the network plot(s) will include a legend. If variable names are extremely long, it may be advisable to set the legend argument to FALSE to maintain plot readability.}
 
-\item{not_plot}{If \code{not_plot = TRUE}, the function will generate network plot(s) that visualize edges that fall below a specified threshold (either the \code{relation_threshold}, \code{direction_threshold}, or \code{combine_threshold}, depending on the input dataframe and the \code{combine} argument). This effectively visualizes the relationships that are considered to be non-causal.}
+\item{not_plot}{If \code{not_plot = TRUE}, the function will generate a "not plot", which is a network plot that visualizes edges that fall below a specified threshold (either the \code{relation_threshold}, \code{direction_threshold}, or \code{combine_threshold}, depending on the input dataframe and the \code{combine} argument). This effectively visualizes the relationships that are considered to be non-causal.}
 }
 \value{
 Either one, two, three, or four edge lists depending on how many probability dataframes were inputted:
@@ -69,6 +69,10 @@ The specific edge list structure varies based on the input:
   \item When a sign probability dataframe is entered, the corresponding edge list will include a fourth column:
     \itemize{
       \item \code{sign}: The sign of the causal relationship (can be either "positive", "negative", or "uncertain").
+    }
+  \item If the \code{not_plot} argument is set to \code{TRUE} the edge list will have an additional column:
+    \itemize{
+      \item \code{NOT_edge}: Contains values used to construct the "not plot" visualization. Edges with weights below a specified threshold (determined by \code{relation_threshold}, \code{direction_threshold}, or \code{combine_threshold}, based on the input dataframe and the \code{combine} argument) are assigned a value of 100, while edges meeting the threshold are assigned a value of 0. This makes it possible to visualize the relationships that are considered to be non-causal.
     }
 }
 }

@@ -59,7 +59,7 @@
 #' @param plot If \code{plot = TRUE} (default), the function will generate network plot(s) visualizing the edge list(s). If \code{plot = FALSE} only the edge list will be created but it will not be visualized.
 #' @param layout This argument controls the layout of the plot and is very similar to the \code{layout} argument of the \code{\link[qgraph]{qgraph}} package. If \code{layout = "average"} and multiple dataframes are inputted, all nodes will be placed in a joint layout (see \code{\link[qgraph:averageLayout]{averageLayout}}). If \code{layout = "average"} and only one dataframe is inputted, the plot will default to a force-embedded layout (same as the "spring" layout in the \code{\link[qgraph]{qgraph}} package). If \code{layout = "circle"}, all nodes will be placed in a single circle (see \code{\link[qgraph]{qgraph}}).
 #' @param legend If \code{legend = TRUE} (default), the network plot(s) will include a legend. If variable names are extremely long, it may be advisable to set the legend argument to FALSE to maintain plot readability.
-#' @param not_plot If \code{not_plot = TRUE}, the function will generate network plot(s) that visualize edges that fall below a specified threshold (either the \code{relation_threshold}, \code{direction_threshold}, or \code{combine_threshold}, depending on the input dataframe and the \code{combine} argument). This effectively visualizes the relationships that are considered to be non-causal.
+#' @param not_plot If \code{not_plot = TRUE}, the function will generate a "not plot", which is a network plot that visualizes edges that fall below a specified threshold (either the \code{relation_threshold}, \code{direction_threshold}, or \code{combine_threshold}, depending on the input dataframe and the \code{combine} argument). This effectively visualizes the relationships that are considered to be non-causal.
 #'
 #' @returns
 #' Either one, two, three, or four edge lists depending on how many probability dataframes were inputted:
@@ -82,6 +82,10 @@
 #'   \item When a sign probability dataframe is entered, the corresponding edge list will include a fourth column:
 #'     \itemize{
 #'       \item \code{sign}: The sign of the causal relationship (can be either "positive", "negative", or "uncertain").
+#'     }
+#'   \item If the \code{not_plot} argument is set to \code{TRUE} the edge list will have an additional column:
+#'     \itemize{
+#'       \item \code{NOT_edge}: Contains values used to construct the "not plot" visualization. Edges with weights below a specified threshold (determined by \code{relation_threshold}, \code{direction_threshold}, or \code{combine_threshold}, based on the input dataframe and the \code{combine} argument) are assigned a value of 100, while edges meeting the threshold are assigned a value of 0. This makes it possible to visualize the relationships that are considered to be non-causal.
 #'     }
 #' }
 #'
