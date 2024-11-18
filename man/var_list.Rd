@@ -18,7 +18,7 @@ var_list(topic,
 
 \item{n_variables}{Number of variables the LLM should generate in the first 2 variable lists. If \code{"all"} (default), the LLM is not limited to generate a specific number of variables, but is asked to create a list of "all" important variables.}
 
-\item{LLM_model}{The LLM model that should be used to generate output: \code{"gpt-4o"} (default), \code{"gpt-4"}, \code{"gpt-4-turbo"} \code{"gpt-3.5-turbo"}, or \code{"mixtral"}.}
+\item{LLM_model}{The LLM model that should be used to generate output: \code{"gpt-4o"} (default), \code{"gpt-4"}, \code{"gpt-4-turbo"} \code{"gpt-3.5-turbo"}, \code{"mixtral"}, or \code{"llama-3"}.}
 
 \item{max_tokens}{The maximum number of tokens the LLM should generate. Be careful when adjusting this argument. Reducing the maximum token limit will reduce the cost but may result in incomplete answers. Conversely, increasing the token limit can be advantageous for obtaining more detailed responses. The maximum number of tokens depends on the model (\code{6000} for \code{"gpt-4o"}, \code{"gpt-4"}, and \code{"gpt-4-turbo"}, \code{3000} for \code{"gpt-3.5-turbo"}, and \code{2000} for \code{"mixtral"}).}
 
@@ -67,7 +67,8 @@ The function and its output should be approached with caution. Depending on the 
 # For a readily available, pre-made output example see: data("vars")
 vars <- var_list(topic = "addiction",
                  n_final = 10,
-                 n_variables = "all")
+                 n_variables = "all",
+                 LLM_model = "llama-3")
 }
 # Check output
 vars$all_vars

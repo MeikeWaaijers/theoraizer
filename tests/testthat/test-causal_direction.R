@@ -80,7 +80,7 @@ test_that("Invalid LLM_model parameter causes error", {
                                                       causal_threshold = 50,
                                                       LLM_model = "invalid_model",
                                                       max_tokens = 1000),
-                         "'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', or 'mixtral'.")
+                         "'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'mixtral', or 'llama-3'.")
 })
 
 test_that("Invalid max_tokens parameter causes error for gpt-4o", {

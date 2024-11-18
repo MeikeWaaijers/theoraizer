@@ -205,8 +205,8 @@ causal_sign <- function(topic,
   stopifnot("All entries in 'prob_df$prob_causal' should be numeric and between 0 and 100." =
               all(sapply(prob_df$prob_causal, function(x) is.numeric(x) && x >= 0 && x <= 100)))
   stopifnot("At least one variable pair should be classified as 'causal'." = sum(prob_df$prob_causal) > 0)
-  stopifnot("'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', or 'mixtral'." =
-              LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"))
+  stopifnot("'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'mixtral', or 'llama-3'." =
+              LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo", "llama-3"))
   stopifnot("For 'gpt-4o', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
               !(LLM_model == "gpt-4o") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("For 'gpt-4', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
@@ -217,6 +217,8 @@ causal_sign <- function(topic,
               !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
   stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." =
               !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
+  stopifnot("For 'llama-3', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
+              !(LLM_model == "llama-3") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("'update_key' should be a logical value." = is.logical(update_key))
 
   ## Load and prepare prompt data
@@ -390,7 +392,7 @@ causal_sign <- function(topic,
 
     #tryCatch in case processing steps fail the raw output will still be outputted
     tryCatch({
-      if (LLM_model == "mixtral") {
+      if (LLM_model == "mixtral" | LLM_model == "llama-3") {
         last_token_f <- NULL
         for (i in row_index) {
           last_token_t <- NULL
@@ -733,7 +735,7 @@ causal_sign <- function(topic,
 
     #tryCatch in case processing steps fail the raw output will still be outputted
     tryCatch({
-      if (LLM_model == "mixtral"){
+      if (LLM_model == "mixtral" | LLM_model == "llama-3"){
         last_token_f_var1 <- NULL
         for (i in row_index_var1) {
           last_token_t <- NULL
@@ -796,7 +798,7 @@ causal_sign <- function(topic,
 
 
       # var2
-      if (LLM_model == "mixtral"){
+      if (LLM_model == "mixtral" | LLM_model == "llama-3"){
         last_token_f_var2 <- NULL
         for (i in row_index_var2) {
           last_token_t <- NULL

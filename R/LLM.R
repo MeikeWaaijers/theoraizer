@@ -36,16 +36,25 @@ LLM <- function(prompt = prompt,
                 raw_output = TRUE,
                 update_key = update_key){
 
-  if (LLM_model == "mixtral") {
+  if (LLM_model == "mixtral" | LLM_model == "llama-3") {
     api_key <- get_api_key("huggingface",
                            update_key = update_key)
 
-    # API endpoint
-    endpoint <- "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions"
+    if (LLM_model == "mixtral") {
+      # API endpoint
+      endpoint <- "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions"
+      model <- "mistralai/Mixtral-8x7B-Instruct-v0.1"
+
+    } else if (LLM_model == "llama-3") {
+      # API endpoint
+      endpoint <- "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions"
+      model <- "meta-llama/Meta-Llama-3-8B-Instruct"
+
+    }
 
     if (logprobs == TRUE) {
       # Request body
-      request_body <- list(model = "mistralai/Mixtral-8x7B-Instruct-v0.1",
+      request_body <- list(model = model,
                            max_tokens = max_tokens,
                            messages = list(
                              list("role" = "system", "content" = system_prompt),
@@ -57,8 +66,8 @@ LLM <- function(prompt = prompt,
 
     } else if (logprobs == FALSE) {
       # Request body
-      request_body <- list(model = "mistralai/Mixtral-8x7B-Instruct-v0.1",
-                           max_new_tokens = max_tokens,
+      request_body <- list(model = model,
+                           max_tokens = max_tokens,
                            messages = list(
                              list("role" = "system", "content" = system_prompt),
                              list("role" = "user", "content" = prompt)

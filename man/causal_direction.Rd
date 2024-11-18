@@ -18,7 +18,7 @@ causal_direction(topic,
 
 \item{causal_threshold}{A number (defaults to \code{50}) that indicates the minimum probability required for a causal relationship to be included.}
 
-\item{LLM_model}{The LLM model that should be used to generate output: \code{"gpt-4o"} (default), \code{"gpt-4"}, \code{"gpt-4-turbo"} \code{"gpt-3.5-turbo"}, or \code{"mixtral"}.}
+\item{LLM_model}{The LLM model that should be used to generate output: \code{"gpt-4o"} (default), \code{"gpt-4"}, \code{"gpt-4-turbo"} \code{"gpt-3.5-turbo"}, \code{"mixtral"}, or \code{"llama-3"}.}
 
 \item{max_tokens}{The maximum number of tokens the LLM should generate. Be careful when adjusting this argument. Reducing the maximum token limit will reduce the cost but may result in incomplete answers. Conversely, increasing the token limit can be advantageous for obtaining more detailed responses. The maximum number of tokens depends on the model (\code{6000} for \code{"gpt-4o"}, \code{"gpt-4"}, and \code{"gpt-4-turbo"}, \code{3000} for \code{"gpt-3.5-turbo"}, and \code{2000} for \code{"mixtral"}).}
 

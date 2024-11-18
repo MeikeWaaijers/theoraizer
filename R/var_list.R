@@ -48,7 +48,7 @@
 #' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
 #' @param n_variables Number of variables the LLM should generate in the first 2 variable lists. If \code{"all"} (default), the LLM is not limited to generate a specific number of variables, but is asked to create a list of "all" important variables.
 #' @param n_final Number of variables to be included in the final variable list. If \code{inf} (default), the final integrated variable list will not be limited to a certain number of variables.
-#' @param LLM_model The LLM model that should be used to generate output: \code{"gpt-4o"} (default), \code{"gpt-4"}, \code{"gpt-4-turbo"} \code{"gpt-3.5-turbo"}, or \code{"mixtral"}.
+#' @param LLM_model The LLM model that should be used to generate output: \code{"gpt-4o"} (default), \code{"gpt-4"}, \code{"gpt-4-turbo"} \code{"gpt-3.5-turbo"}, \code{"mixtral"}, or \code{"llama-3"}.
 #' @param max_tokens The maximum number of tokens the LLM should generate. Be careful when adjusting this argument. Reducing the maximum token limit will reduce the cost but may result in incomplete answers. Conversely, increasing the token limit can be advantageous for obtaining more detailed responses. The maximum number of tokens depends on the model (\code{6000} for \code{"gpt-4o"}, \code{"gpt-4"}, and \code{"gpt-4-turbo"}, \code{3000} for \code{"gpt-3.5-turbo"}, and \code{2000} for \code{"mixtral"}).
 #' @param update_key If \code{update_key = TRUE}, the function will prompt the user for a new API key and update the saved key. If \code{update_key = FALSE} (default), the function will use the existing API key if available.
 #'
@@ -90,7 +90,8 @@
 #' # For a readily available, pre-made output example see: data("vars")
 #' vars <- var_list(topic = "addiction",
 #'                  n_final = 10,
-#'                  n_variables = "all")
+#'                  n_variables = "all",
+#'                  LLM_model = "llama-3")
 #' }
 #' # Check output
 #' vars$all_vars
@@ -117,8 +118,8 @@ var_list <- function(topic,
               is.numeric(n_final) && n_final == floor(n_final) && n_final >= 0)
   stopifnot("'n_variables' should be a whole number above 0 or the input should be 'all'." =
               ((is.numeric(n_variables) && n_variables == floor(n_variables) && n_variables >= 0) || n_variables == "all"))
-  stopifnot("'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', or 'mixtral'." =
-              LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"))
+  stopifnot("'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'mixtral', or 'llama-3'." =
+              LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo", "llama-3"))
   stopifnot("For 'gpt-4o', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
               !(LLM_model == "gpt-4o") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("For 'gpt-4', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
@@ -129,6 +130,8 @@ var_list <- function(topic,
               !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
   stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." =
               !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
+  stopifnot("For 'llama-3', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
+              !(LLM_model == "llama-3") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("'update_key' should be a logical value." = is.logical(update_key))
 
   ## Load and prepare prompt data

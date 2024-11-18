@@ -112,8 +112,8 @@ causal_relation <- function(topic,
   stopifnot("'variable_list' should be a vector containing more than one variables." = is.vector(variable_list) && length(variable_list) > 1)
   stopifnot("All entries in 'variable_list' should be character strings." =
               all(sapply(variable_list, is.character)))
-  stopifnot("'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', or 'mixtral'." =
-              LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo"))
+  stopifnot("'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'mixtral', or 'llama-3'." =
+              LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo", "llama-3"))
   stopifnot("For 'gpt-4o', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
               !(LLM_model == "gpt-4o") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("For 'gpt-4', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
@@ -124,6 +124,8 @@ causal_relation <- function(topic,
               !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
   stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." =
               !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
+  stopifnot("For 'llama-3', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
+              !(LLM_model == "llama-3") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("'update_key' should be a logical value." = is.logical(update_key))
 
   ## Load and prepare prompt data
@@ -240,7 +242,7 @@ causal_relation <- function(topic,
   #tryCatch in case processing steps fail the raw output will still be outputted
   tryCatch({
 
-    if (LLM_model == "mixtral"){
+    if (LLM_model == "mixtral" | LLM_model == "llama-3"){
       last_token <- NULL
       for (i in 1:n_pairs) {
         last_token_t <- NULL
