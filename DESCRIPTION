@@ -1,7 +1,7 @@
 Package: theoraizer
 Type: Package
 Title: Develop Theories using Large Language Models
-Version: 1.2.1
+Version: 1.3.0
 Authors@R: person("Meike", "Waaijers", email = "m.waaijers@uva.nl",
   role = c("aut", "cre"))
 Maintainer: Meike Waaijers <m.waaijers@uva.nl>
