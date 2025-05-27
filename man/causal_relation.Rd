@@ -15,7 +15,7 @@ causal_relation(topic,
 
 \item{variable_list}{A vector containing all variables that need to be included in the theory.}
 
-\item{LLM_model}{The LLM model that should be used to generate output: \code{"gpt-4o"} (default), \code{"gpt-4"}, \code{"gpt-4-turbo"} \code{"gpt-3.5-turbo"}, \code{"mixtral"}, or \code{"llama-3"}.}
+\item{LLM_model}{The LLM model that should be used to generate output: \code{"gpt-4o"} (default), \code{"gpt-4"}, \code{"gpt-4-turbo"} \code{"gpt-3.5-turbo"}, \code{"llama-3"} (specifically points to Llama-3-70B-Chat-hf, accessed via Hugging Face), or \code{"mixtral"} (specifically points to Mixtral-8x7B-Instruct-v0.1, accessed via Together.ai).}
 
 \item{max_tokens}{The maximum number of tokens the LLM should generate. Be careful when adjusting this argument. Reducing the maximum token limit will reduce the cost but may result in incomplete answers. Conversely, increasing the token limit can be advantageous for obtaining more detailed responses. The maximum number of tokens depends on the model (\code{6000} for \code{"gpt-4o"}, \code{"gpt-4"}, and \code{"gpt-4-turbo"}, \code{3000} for \code{"gpt-3.5-turbo"}, and \code{2000} for \code{"mixtral"}).}
 

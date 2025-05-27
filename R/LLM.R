@@ -36,21 +36,50 @@ LLM <- function(prompt = prompt,
                 raw_output = TRUE,
                 update_key = update_key){
 
-  if (LLM_model == "mixtral" | LLM_model == "llama-3") {
+
+  if (LLM_model == "llama-3") {
+    api_key <- get_api_key("togetherai",
+                           update_key = update_key)
+
+    # API endpoint
+    endpoint <- "https://api.together.xyz/v1/chat/completions"
+    model <- "meta-llama/Llama-3-70b-chat-hf"
+
+    # Request body
+    request_body <- list(model = model,
+                         max_tokens = max_tokens,
+                         messages = list(
+                           list(role = "system", content = system_prompt),
+                           list(role = "user", content = prompt)
+                         ),
+                         temperature = temperature,
+                         logprobs = logprobs)
+
+
+
+    # Make the API request
+    request <- httr::RETRY(verb = "POST",
+                           url = endpoint,
+                           body = request_body,
+                           httr::add_headers(Authorization = paste("Bearer", api_key),
+                                             `Content-Type` = "application/json"),
+                           encode = "json",
+                           times = 5,
+                           httr::timeout(timeout_sec))
+
+    # Extract the response
+    raw_content <- content <- httr::content(request)
+    output <- content$choices[[1]]$message$content
+
+
+  } else if (LLM_model == "mixtral") {
     api_key <- get_api_key("huggingface",
                            update_key = update_key)
 
-    if (LLM_model == "mixtral") {
-      # API endpoint
-      endpoint <- "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions"
-      model <- "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
-    } else if (LLM_model == "llama-3") {
-      # API endpoint
-      endpoint <- "https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions"
-      model <- "meta-llama/Meta-Llama-3-8B-Instruct"
-
-    }
+    # API endpoint
+    endpoint <- "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions"
+    model <- "mistralai/Mixtral-8x7B-Instruct-v0.1"
 
     if (logprobs == TRUE) {
       # Request body
@@ -63,6 +92,7 @@ LLM <- function(prompt = prompt,
                            temperature = temperature,
                            logprobs = logprobs,
                            top_logprobs = top_logprobs)
+
 
     } else if (logprobs == FALSE) {
       # Request body

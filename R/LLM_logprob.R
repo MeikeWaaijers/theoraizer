@@ -23,26 +23,50 @@
 LLM_logprobs <- function(raw_content,
                          LLM_model = LLM_model) {
 
-  length <- length(raw_content$choices[[1]]$logprobs$content)
-  logprobs_dfs <- vector("list", length = length)
+  if (LLM_model == "llama-3") {
 
-  for (j in seq_along(logprobs_dfs)) {
-    logprobs_list <- raw_content$choices[[1]]$logprobs$content[[j]]$top_logprobs
+    length <- length(raw_content$choices[[1]]$logprobs$tokens)
+    logprobs_dfs <- vector("list", length = length)
 
-    top5_tokens <- vector("list", length = length(logprobs_list))
-    top5_logprobs <- numeric(length(logprobs_list))
-    top5_probabilities <- numeric(length(logprobs_list))
+    top5_tokens <- vector("list", length = length)
+    top5_logprobs <- numeric(length)
+    top5_probabilities <- numeric(length)
 
-    for (i in seq_along(logprobs_list)) {
-      top5_tokens[[i]] <- logprobs_list[[i]]$token
-      top5_logprobs[i] <- logprobs_list[[i]]$logprob
+    for (j in seq_along(logprobs_dfs)) {
 
-      top5_probabilities[i] <- round(exp(top5_logprobs[i]) * 100, 2)
+      top5_tokens <- raw_content$choices[[1]]$logprobs$tokens[[j]]
+      top5_logprobs <- raw_content$choices[[1]]$logprobs$token_logprobs[[j]]
+      top5_probabilities <- round(exp(top5_logprobs) * 100, 2)
+
+      logprobs_dfs[[j]] <- data.frame(top5_tokens = unlist(top5_tokens),
+                                      logprob = top5_logprobs,
+                                      probability = top5_probabilities)
+
+      }
+
+  } else {
+
+    length <- length(raw_content$choices[[1]]$logprobs$content)
+    logprobs_dfs <- vector("list", length = length)
+
+    for (j in seq_along(logprobs_dfs)) {
+      logprobs_list <- raw_content$choices[[1]]$logprobs$content[[j]]$top_logprobs
+
+      top5_tokens <- vector("list", length = length(logprobs_list))
+      top5_logprobs <- numeric(length(logprobs_list))
+      top5_probabilities <- numeric(length(logprobs_list))
+
+      for (i in seq_along(logprobs_list)) {
+        top5_tokens[[i]] <- logprobs_list[[i]]$token
+        top5_logprobs[i] <- logprobs_list[[i]]$logprob
+
+        top5_probabilities[i] <- round(exp(top5_logprobs[i]) * 100, 2)
+      }
+
+      logprobs_dfs[[j]] <- data.frame(top5_tokens = unlist(top5_tokens),
+                                      logprob = top5_logprobs,
+                                      probability = top5_probabilities)
     }
-
-    logprobs_dfs[[j]] <- data.frame(top5_tokens = unlist(top5_tokens),
-                                    logprob = top5_logprobs,
-                                    probability = top5_probabilities)
   }
 
   return(logprobs_dfs)

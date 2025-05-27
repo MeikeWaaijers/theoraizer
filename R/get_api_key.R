@@ -52,6 +52,8 @@ get_api_key <- function(service_name, update_key = FALSE) {
       cat("1. Create an API key on https://huggingface.co/settings/tokens \n")
     } else if (service_name == "openai") {
       cat("1. Create an API key on https://platform.openai.com/account/api-keys \n")
+    } else if (service_name == "togetherai") {
+      cat("1. Create an API key on https://api.together.xyz/settings/api-keys \n")
     }
     cat("2. Please enter your API key below to add/update it.")
     answer <- readline("API key = ")
