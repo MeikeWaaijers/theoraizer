@@ -27,7 +27,7 @@
 #' The \code{cld()} function can be used to quickly generate a Causal Loop Diagram (CLD). This function uses the \code{\link{causal_relation}}, \code{\link{causal_direction}}, \code{\link{causal_sign}}, and \code{\link{cld_plot}} functions included in this R package. For greater control and access to more outputs, we recommend using these functions individually.
 #'
 #' @usage
-#' cld(topic,
+#' cld(context,
 #'     variable_list,
 #'     plot = TRUE,
 #'     LLM_model = "gpt-4o",
@@ -38,7 +38,7 @@
 #'
 #' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}}
 #'
-#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the parameter can be set to NULL.
+#' @param context A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the parameter can be set to NULL.
 #' @param variable_list A vector containing all variables that need to be included in the theory.
 #' @param plot If \code{plot = TRUE} (default), the function will generate network plot(s) visualizing the edge list(s).
 #' @inheritParams var_list
@@ -109,7 +109,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' ## Example input (topic = "addiction")
+#' ## Example input (context = "addiction")
 #' data("vars")
 #' vars$final_list
 #'
@@ -117,7 +117,7 @@
 #' ## Default
 #' # For a readily available, pre-made output example see: data("cld_example")
 #'
-#' cld_example <- cld(topic = "addiction",
+#' cld_example <- cld(context = "addiction",
 #'                    variable_list = vars$final_list)
 #'
 #' # Check output
@@ -130,7 +130,7 @@
 #' @import shiny
 #' @export
 
-cld <- function(topic,
+cld <- function(context,
                 variable_list,
                 plot = TRUE,
                 LLM_model = "gpt-4o",
@@ -141,7 +141,7 @@ cld <- function(topic,
   is_shiny <- shiny::isRunning()
 
   # Validate input
-  stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
+  stopifnot("'context' should be a character string or NULL." = is.character(context) | is.null(context))
   stopifnot("'variable_list' should be a vector containing more than one variables." = is.vector(variable_list) && length(variable_list) > 1)
   stopifnot("All entries in 'variable_list' should be character strings." = all(sapply(variable_list, is.character)))
   stopifnot("'plot' should be a logical value." = is.logical(plot))
@@ -161,7 +161,7 @@ cld <- function(topic,
 
   # Step 1: causal_relation
   tryCatch({
-    causrel <- causal_relation(topic = topic,
+    causrel <- causal_relation(context = context,
                                variable_list = variable_list,
                                LLM_model = LLM_model,
                                max_tokens = max_tokens,
@@ -177,7 +177,7 @@ cld <- function(topic,
 
   # Step 2: causal_direction
   tryCatch({
-    causdir <- causal_direction(topic = topic,
+    causdir <- causal_direction(context = context,
                                 relation_df = causrel$relation_df,
                                 LLM_model = LLM_model,
                                 max_tokens = max_tokens,
@@ -192,7 +192,7 @@ cld <- function(topic,
 
   # Step 3: causal_sign
   tryCatch({
-    caussign <- causal_sign(topic = topic,
+    caussign <- causal_sign(context = context,
                             prob_df = causdir$direction_df,
                             LLM_model = LLM_model,
                             max_tokens = max_tokens,
@@ -208,7 +208,7 @@ cld <- function(topic,
   # Step 4: cld_plot (optional)
   if (plot == TRUE) {
     tryCatch({
-      theoryplot <- cld_plot(topic = topic,
+      theoryplot <- cld_plot(context = context,
                              dir_sign_df = caussign$sign_df)
     }, error = function(e) {
       if (is_shiny) {

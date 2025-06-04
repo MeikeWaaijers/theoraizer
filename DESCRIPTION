@@ -10,7 +10,7 @@ Description: Use Large Language Models (LLMs) to construct a coherent theory
   variables and their causal relationships, and can be visually represented.
 URL: https://github.com/MeikeWaaijers/theoraizer
 Depends: 
-    R (>= 2.10)
+    R (>= 3.5)
 Imports: 
     httr (>= 1.4.7),
     utils (>= 4.3.2),

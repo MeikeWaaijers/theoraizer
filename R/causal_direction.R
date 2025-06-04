@@ -27,7 +27,7 @@
 #' In \code{causal_direction()} a Large Language Model (LLM) is asked to indicate the causal direction for each pair of variables previously classified as "causal". This is done by asking the LLM to indicate whether a change in one variable will directly cause a change in the other variable.
 #'
 #' @usage
-#' causal_direction(topic,
+#' causal_direction(context,
 #'                  relation_df,
 #'                  causal_threshold = 50,
 #'                  LLM_model = "gpt-4o",
@@ -38,7 +38,7 @@
 #'
 #' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}}
 #'
-#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
+#' @param context A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the argument can be set to NULL.
 #' @param relation_df A dataframe with a unique pair of variables on each row and the probability of the existence of a causal relationship between these variables. (The \code{relation_df} output of the \code{\link{causal_relation}} function).
 #' @param causal_threshold A number (defaults to \code{50}) that indicates the minimum probability required for a causal relationship to be included.
 #' @inheritParams var_list
@@ -87,14 +87,14 @@
 #'
 #' @examples
 #' \dontrun{
-#' ## Example input (topic = "addiction")
+#' ## Example input (context = "addiction")
 #' data("rel")
 #' rel$relation_df
 #'
 #' #---------------------------------------------------------------------------
 #' ## Default
 #' # For a readily available, pre-made output example see: data("dir")
-#' dir <- causal_direction(topic = "addiction",
+#' dir <- causal_direction(context = "addiction",
 #'                         relation_df = rel$relation_df)
 #'
 #' # Check output
@@ -107,7 +107,7 @@
 
 
 ## causal_direction function
-causal_direction <- function(topic,
+causal_direction <- function(context,
                              relation_df,
                              causal_threshold = 50,
                              LLM_model = "gpt-4o",
@@ -115,7 +115,7 @@ causal_direction <- function(topic,
                              update_key = FALSE) {
 
   #validate input
-  stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
+  stopifnot("'context' should be a character string or NULL." = is.character(context) | is.null(context))
   stopifnot("'causal_threshold' should be a number between 0 and 100, and cannot have more than two decimal points." =
               is.numeric(causal_threshold) && causal_threshold >= 0 && causal_threshold <= 100 && round(causal_threshold, 2) == causal_threshold)
   stopifnot("'relation_df' should be a dataframe." = is.data.frame(relation_df))
@@ -202,7 +202,7 @@ causal_direction <- function(topic,
     for (g in 1:2) {
 
       if (length(var1_prompt_database) == 0) {
-        if (is.null(topic)) {
+        if (is.null(context)) {
           # Create prompts for var 1
           var1_prompt1 <- gsub("\\((var_1\\[i\\])\\)", var_1[i],
                                gsub("\\((var_2\\[i\\])\\)", var_2[i],
@@ -214,12 +214,12 @@ causal_direction <- function(topic,
 
         } else {
           # Create prompts for var 1
-          var1_prompt1 <- gsub("\\((topic)\\)", topic,
+          var1_prompt1 <- gsub("\\((context)\\)", context,
                                gsub("\\((var_1\\[i\\])\\)", var_1[i],
                                     gsub("\\((var_2\\[i\\])\\)", var_2[i],
                                          dir_prompts$Prompt[3])))
 
-          var1_prompt2 <- gsub("\\((topic)\\)", topic,
+          var1_prompt2 <- gsub("\\((context)\\)", context,
                                gsub("\\((var_1\\[i\\])\\)", var_1[i],
                                     gsub("\\((var_2\\[i\\])\\)", var_2[i],
                                          dir_prompts$Prompt[4])))
@@ -232,7 +232,7 @@ causal_direction <- function(topic,
       }
 
       if (length(var2_prompt_database) == 0) {
-        if (is.null(topic)) {
+        if (is.null(context)) {
           # Create prompts for var 2
           var2_prompt1 <- gsub("\\((var_2\\[i\\])\\)", var_2[i],
                                gsub("\\((var_1\\[i\\])\\)", var_1[i],
@@ -244,12 +244,12 @@ causal_direction <- function(topic,
 
         } else {
           # Create prompts for var 2
-          var2_prompt1 <- gsub("\\((topic)\\)", topic,
+          var2_prompt1 <- gsub("\\((context)\\)", context,
                                gsub("\\((var_2\\[i\\])\\)", var_2[i],
                                     gsub("\\((var_1\\[i\\])\\)", var_1[i],
                                          dir_prompts$Prompt[7])))
 
-          var2_prompt2 <- gsub("\\((topic)\\)", topic,
+          var2_prompt2 <- gsub("\\((context)\\)", context,
                                gsub("\\((var_2\\[i\\])\\)", var_2[i],
                                     gsub("\\((var_1\\[i\\])\\)", var_1[i],
                                          dir_prompts$Prompt[8])))
@@ -264,7 +264,7 @@ causal_direction <- function(topic,
       var2_prompt <- var2_prompt_database[[g]]
 
       if (length(sys_prompt_database) == 0) {
-        if (is.null(topic)){
+        if (is.null(context)){
           # Create system prompts
           system_prompt1 <- dir_prompts$Sys.Prompt[1]
           system_prompt2 <- dir_prompts$Sys.Prompt[2]

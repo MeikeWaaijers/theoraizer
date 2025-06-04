@@ -5,7 +5,7 @@ library(theoraizer)
 test_that("cld() works", {
   skip_on_cran()
   vcr::use_cassette("cld", {
-    output <- theoraizer::cld(topic = "addiction",
+    output <- theoraizer::cld(context = "addiction",
                               variable_list = theoraizer::vars$final_list[1:2],
                               plot = TRUE,
                               LLM_model = "gpt-4",
@@ -43,7 +43,7 @@ test_that("cld() works", {
 })
 
 test_that("Invalid variable_list parameter causes error", {
-  testthat::expect_error(theoraizer::cld(topic = "Climate Change",
+  testthat::expect_error(theoraizer::cld(context = "Climate Change",
                                          variable_list = "not_a_vector",
                                          plot = TRUE,
                                          LLM_model = "gpt-4",
@@ -52,7 +52,7 @@ test_that("Invalid variable_list parameter causes error", {
 })
 
 test_that("Invalid entries in variable_list cause error", {
-  testthat::expect_error(theoraizer::cld(topic = "Climate Change",
+  testthat::expect_error(theoraizer::cld(context = "Climate Change",
                                          variable_list = list(123, "Temperature", "Sea Level"),
                                          plot = TRUE,
                                          LLM_model = "gpt-4",
@@ -61,7 +61,7 @@ test_that("Invalid entries in variable_list cause error", {
 })
 
 test_that("Invalid plot parameter causes error", {
-  testthat::expect_error(theoraizer::cld(topic = "Climate Change",
+  testthat::expect_error(theoraizer::cld(context = "Climate Change",
                                          variable_list = c("CO2", "Temperature", "Sea Level"),
                                          plot = "not_logical",
                                          LLM_model = "gpt-4",
@@ -70,7 +70,7 @@ test_that("Invalid plot parameter causes error", {
 })
 
 test_that("Invalid LLM_model parameter causes error", {
-  testthat::expect_error(theoraizer::cld(topic = "Climate Change",
+  testthat::expect_error(theoraizer::cld(context = "Climate Change",
                                          variable_list = c("CO2", "Temperature", "Sea Level"),
                                          plot = TRUE,
                                          LLM_model = "invalid_model",
@@ -79,7 +79,7 @@ test_that("Invalid LLM_model parameter causes error", {
 })
 
 test_that("Invalid max_tokens parameter causes error for gpt-4o", {
-  testthat::expect_error(theoraizer::cld(topic = "Climate Change",
+  testthat::expect_error(theoraizer::cld(context = "Climate Change",
                                          variable_list = c("CO2", "Temperature", "Sea Level"),
                                          plot = TRUE,
                                          LLM_model = "gpt-4o",
@@ -88,7 +88,7 @@ test_that("Invalid max_tokens parameter causes error for gpt-4o", {
 })
 
 test_that("Invalid max_tokens parameter causes error for gpt-3.5-turbo", {
-  testthat::expect_error(theoraizer::cld(topic = "Climate Change",
+  testthat::expect_error(theoraizer::cld(context = "Climate Change",
                                          variable_list = c("CO2", "Temperature", "Sea Level"),
                                          plot = TRUE,
                                          LLM_model = "gpt-3.5-turbo",

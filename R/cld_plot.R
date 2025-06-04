@@ -27,7 +27,7 @@
 #' \code{cld_plot()} creates an edge list for each probability dataframe provided. These edge lists are then transformed into network graphs using the \code{\link[qgraph]{qgraph}} package. An edge list is a list containing all the links between nodes. In this function, these nodes symbolise variables, while the edges denote the causal relationships that link these variables.
 #'
 #' @usage
-#' cld_plot(topic,
+#' cld_plot(context,
 #'          relation_df = NULL,
 #'          direction_df = NULL,
 #'          rel_sign_df = NULL,
@@ -46,7 +46,7 @@
 #'
 #' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}}
 #'
-#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
+#' @param context A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the argument can be set to NULL.
 #' @param relation_df A dataframe with a unique pair of variables on each row and the probability of the existence of a causal relationship between these variables. (The \code{relation_df} output of the \code{\link{causal_relation}} function).
 #' @param direction_df A dataframe with on every row a unique variable pair, the probability of the presence of a causal relationship between these variables, and the cause variable probability for each variable in the pair (The \code{direction_df} output from the \code{\link{causal_direction}}.
 #' @param rel_sign_df A dataframe containing all pairs of variables, the probability of a causal relationship between these variables, and the probability of a positive or negative causal relationship (the \code{sign_df} output of the \code{\link{causal_sign}} function when a \code{prob_causual_df} is inputted in the \code{\link{causal_sign}} function).
@@ -105,7 +105,7 @@
 #'
 #' @examples
 #'
-#' ## Example input (topic = addiction).
+#' ## Example input (context = addiction).
 #' # Relation probability dataframe input
 #' data("rel")
 #' rel$relation_df
@@ -126,7 +126,7 @@
 #' #---------------------------------------------------------------------------
 #' ## Create all four edge lists & plots with default settings.
 #' # For a readily available, pre-made output example see: data("edge_lists")
-#' edge_lists <- cld_plot(topic = "addiction",
+#' edge_lists <- cld_plot(context = "addiction",
 #'                        relation_df = rel$relation_df,
 #'                        direction_df = dir$direction_df,
 #'                        rel_sign_df = rel_sign$sign_df,
@@ -141,7 +141,7 @@
 #' #---------------------------------------------------------------------------
 #' \dontrun{
 #' ## Create all four edge lists & plots with a "circle" layout.
-#' edge_lists <- cld_plot(topic = "addiction",
+#' edge_lists <- cld_plot(context = "addiction",
 #'                        relation_df = rel$relation_df,
 #'                        direction_df = dir$direction_df,
 #'                        rel_sign_df = rel_sign$sign_df,
@@ -151,7 +151,7 @@
 #' #---------------------------------------------------------------------------
 #' ## Create an edge list only for a direction dataframe and do not use the combined probability.
 #' # Plot with direction_threshold set to 10.
-#' dir_edge_list <- cld_plot(topic = "addiction",
+#' dir_edge_list <- cld_plot(context = "addiction",
 #'                           direction_df = dir$direction_df,
 #'                           combine = FALSE,
 #'                           direction_threshold = 10)
@@ -159,14 +159,14 @@
 #' #---------------------------------------------------------------------------
 #' ## Create an edge list only for a direction with sign dataframe and use the combined probability.
 #' # Plot with combine_threshold set to 80.
-#' combine_edge_list <- cld_plot(topic = "addiction",
+#' combine_edge_list <- cld_plot(context = "addiction",
 #'                               dir_sign_df = dir_sign$sign_df,
 #'                               combine = TRUE,
 #'                               combine_threshold = 80)
 #'
 #' #---------------------------------------------------------------------------
 #' ## Create a NOT plot for a relation dataframe
-#' not <- cld_plot(topic = "addiction",
+#' not <- cld_plot(context = "addiction",
 #'                         relation_df = rel$relation_df,
 #'                         not_plot = TRUE)
 #' }
@@ -175,7 +175,7 @@
 
 
 ## cld_plot function
-cld_plot <- function(topic,
+cld_plot <- function(context,
                      relation_df = NULL,
                      direction_df = NULL,
                      rel_sign_df = NULL,
@@ -191,7 +191,7 @@ cld_plot <- function(topic,
                      not_plot = FALSE) {
 
   #validate input
-  stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
+  stopifnot("'context' should be a character string or NULL." = is.character(context) | is.null(context))
 
   if (is.null(relation_df) && is.null(direction_df) && is.null(rel_sign_df) && is.null(dir_sign_df)) {
     test <- FALSE
@@ -211,9 +211,9 @@ cld_plot <- function(topic,
 
   stopifnot("'not_plot' should be a logical value." = is.logical(not_plot))
 
-  # Create topic for title
-  if (is.null(topic)) {
-    topic <- "unspecified"
+  # Create context for title
+  if (is.null(context)) {
+    context <- "unspecified"
   }
 
   # Create empty output so things can be added on later
@@ -307,7 +307,7 @@ cld_plot <- function(topic,
                                 legend.cex = 0.4,
                                 legend.mode = "names",
                                 GLratio = 2,
-                                title = paste0("NOT plot (causal relations): ", topic),
+                                title = paste0("NOT plot (causal relations): ", context),
                                 title.cex = 1.2,
                                 directed = TRUE,
                                 bidirectional = TRUE,
@@ -332,7 +332,7 @@ cld_plot <- function(topic,
                                 legend.cex = 0.4,
                                 legend.mode = "names",
                                 GLratio = 2,
-                                title = paste0("Causal relation plot: ", topic),
+                                title = paste0("Causal relation plot: ", context),
                                 title.cex = 1.2,
                                 directed = TRUE,
                                 bidirectional = TRUE,
@@ -467,8 +467,8 @@ cld_plot <- function(topic,
                                 legend.mode = "names",
                                 GLratio = 2,
                                 title = ifelse(combine,
-                                               paste0("NOT plot (causal combined): ", topic),
-                                               paste0("NOT plot (causal direction): ", topic)),
+                                               paste0("NOT plot (causal combined): ", context),
+                                               paste0("NOT plot (causal direction): ", context)),
                                 title.cex = 1.2,
                                 DoNotPlot = TRUE)
 
@@ -492,8 +492,8 @@ cld_plot <- function(topic,
                                 legend.mode = "names",
                                 GLratio = 2,
                                 title = ifelse(combine,
-                                               paste0("Causal combined plot: ", topic),
-                                               paste0("Causal direction plot: ", topic)),
+                                               paste0("Causal combined plot: ", context),
+                                               paste0("Causal direction plot: ", context)),
                                 title.cex = 1.2,
                                 DoNotPlot = TRUE)
 
@@ -616,7 +616,7 @@ cld_plot <- function(topic,
                                     legend.cex = 0.4,
                                     legend.mode = "names",
                                     GLratio = 2,
-                                    title = paste0("NOT plot (causal relations & sign): ", topic),
+                                    title = paste0("NOT plot (causal relations & sign): ", context),
                                     title.cex = 1.2,
                                     directed = TRUE,
                                     bidirectional = TRUE,
@@ -642,7 +642,7 @@ cld_plot <- function(topic,
                                     legend.cex = 0.4,
                                     legend.mode = "names",
                                     GLratio = 2,
-                                    title = paste0("Causal relation & sign plot: ", topic),
+                                    title = paste0("Causal relation & sign plot: ", context),
                                     title.cex = 1.2,
                                     directed = TRUE,
                                     bidirectional = TRUE,
@@ -843,8 +843,8 @@ cld_plot <- function(topic,
                                     legend.mode = "names",
                                     GLratio = 2,
                                     title = ifelse(combine,
-                                                   paste0("NOT plot (causal combined & sign): ", topic),
-                                                   paste0("NOT plot (causal direction & sign): ", topic)),
+                                                   paste0("NOT plot (causal combined & sign): ", context),
+                                                   paste0("NOT plot (causal direction & sign): ", context)),
                                     title.cex = 1.2,
                                     DoNotPlot = TRUE)
 
@@ -868,8 +868,8 @@ cld_plot <- function(topic,
                                     legend.mode = "names",
                                     GLratio = 2,
                                     title = ifelse(combine,
-                                                   paste0("Causal combined & sign plot: ", topic),
-                                                   paste0("Causal direction & sign plot: ", topic)),
+                                                   paste0("Causal combined & sign plot: ", context),
+                                                   paste0("Causal direction & sign plot: ", context)),
                                     title.cex = 1.2,
                                     DoNotPlot = TRUE)
       }

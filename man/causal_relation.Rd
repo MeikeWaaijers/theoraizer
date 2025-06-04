@@ -4,14 +4,14 @@
 \alias{causal_relation}
 \title{Identify the Presence of Causal Relationships}
 \usage{
-causal_relation(topic,
+causal_relation(context,
                 variable_list,
                 LLM_model = "gpt-4o",
                 max_tokens = 2000,
                 update_key = FALSE)
 }
 \arguments{
-\item{topic}{A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.}
+\item{context}{A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the argument can be set to NULL.}
 
 \item{variable_list}{A vector containing all variables that need to be included in the theory.}
 
@@ -60,14 +60,14 @@ The function and its output should be approached with caution. Depending on the 
 }
 \examples{
 \dontrun{
-## Example input (topic = "addiction")
+## Example input (context = "addiction")
 data("vars")
 vars$final_list
 
 #---------------------------------------------------------------------------
 ## Default
 # For a readily available, pre-made output example see: data("rel")
-rel <- causal_relation(topic = "addiction",
+rel <- causal_relation(context = "addiction",
                        variable_list = vars$final_list)
 
 # Check output
