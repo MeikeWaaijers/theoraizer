@@ -36,7 +36,7 @@ vars
 }
 \description{
 This data set contains 2 lists of variables related to the context of addiction.
-The data was generated using the \code{\link{var_list}} function and the "gpt-3.5-turbo-instruct" Large Language Model (LLM).
+The data was generated using the \code{\link{var_list}} function and the "gpt-4o" Large Language Model (LLM).
 }
 \examples{
 data("vars")
