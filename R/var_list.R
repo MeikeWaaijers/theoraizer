@@ -1,5 +1,5 @@
 # Program Name: theoraizer
-# Description: In the var_list function a Large Language Model (LLM) is instructed to generate a list of important variables for a particular topic.
+# Description: In the var_list function a Large Language Model (LLM) is instructed to generate a list of important variables for a particular context.
 # Copyright (C) <2024> <Meike Waaijers>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 #' Create a Variable List
 #'
 #' @description
-#' In \code{var_list()} a Large Language Model (LLM) is instructed to generate a list of important variables for a particular topic.
+#' In \code{var_list()} a Large Language Model (LLM) is instructed to generate a list of important variables for a particular context.
 #'
 #' The function prompts a LLM to compile two lists of variables with 2 different prompts.
 #' The LLM is instructed to include only variables that are precisely defined and measured on a binary or continuous scale.
@@ -34,7 +34,8 @@
 #' In addition, users can limit the final number of variables, prompting the LLM to select the N most important variables.
 #'
 #' @usage
-#' var_list(topic,
+#' var_list(context,
+#'          include_context = FALSE,
 #'          n_final = Inf,
 #'          n_variables = "all",
 #'          LLM_model = "gpt-4o",
@@ -45,7 +46,8 @@
 #'
 #' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}}
 #'
-#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
+#' @param context A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the argument can be set to NULL.
+#' @param include_context If \code{include_context = FALSE} (default), the context specified in the \code{"context"} argument will not be included as a seperate variable in the variable list.
 #' @param n_variables Number of variables the LLM should generate in the first 2 variable lists. If \code{"all"} (default), the LLM is not limited to generate a specific number of variables, but is asked to create a list of "all" important variables.
 #' @param n_final Number of variables to be included in the final variable list. If \code{inf} (default), the final integrated variable list will not be limited to a certain number of variables.
 #' @param LLM_model The LLM model that should be used to generate output: \code{"gpt-4o"} (default), \code{"gpt-4"}, \code{"gpt-4-turbo"} \code{"gpt-3.5-turbo"}, \code{"llama-3"} (specifically points to Llama-3-70B-Chat-hf, accessed via Hugging Face), or \code{"mixtral"} (specifically points to Mixtral-8x7B-Instruct-v0.1, accessed via Together.ai).
@@ -88,10 +90,9 @@
 #' @examples
 #' \dontrun{
 #' # For a readily available, pre-made output example see: data("vars")
-#' vars <- var_list(topic = "addiction",
+#' vars <- var_list(context = "addiction",
 #'                  n_final = 10,
-#'                  n_variables = "all",
-#'                  LLM_model = "llama-3")
+#'                  n_variables = "all")
 #' }
 #' # Check output
 #' vars$all_vars
@@ -104,7 +105,8 @@
 
 
 ## var_list function
-var_list <- function(topic,
+var_list <- function(context,
+                     include_context = FALSE,
                      n_final = Inf,
                      n_variables = "all",
                      LLM_model = "gpt-4o",
@@ -113,7 +115,8 @@ var_list <- function(topic,
 
 
   #validate input
-  stopifnot("'topic' should be a character string." = is.character(topic))
+  stopifnot("'context' should be a character string." = is.character(context))
+  stopifnot("'include_context' should be a logical value." = is.logical(include_context))
   stopifnot("'n_final' should be a whole number above 0." =
               is.numeric(n_final) && n_final == floor(n_final) && n_final >= 0)
   stopifnot("'n_variables' should be a whole number above 0 or the input should be 'all'." =
@@ -179,20 +182,20 @@ var_list <- function(topic,
 
   # First create 2 prompts
   prompt1 <- gsub("\\((n_variables)\\)", n_variables,
-                  gsub("\\((topic)\\)", topic,
+                  gsub("\\((context)\\)", context,
                        var_prompts$Prompt[1]))
 
   prompt2 <- gsub("\\((n_variables)\\)", n_variables,
-                  gsub("\\((topic)\\)", topic,
+                  gsub("\\((context)\\)", context,
                        var_prompts$Prompt[2]))
 
   prompt_database <- c(prompt1, prompt2)
 
   # Create system prompts
-  system_prompt1 <- gsub("\\((topic)\\)", topic,
+  system_prompt1 <- gsub("\\((context)\\)", context,
                          var_prompts$Sys.Prompt[1])
 
-  system_prompt2 <- gsub("\\((topic)\\)", topic,
+  system_prompt2 <- gsub("\\((context)\\)", context,
                          prompts_data$Sys.Prompt[2])
 
   sys_prompt_database <- c(system_prompt1, system_prompt2)
@@ -228,6 +231,7 @@ var_list <- function(topic,
       split_text[k] <- strsplit(runs[[k]], split = "\n") # Split the string by newline character
     }
     all_lists <- lapply(split_text, function(x) sub("^\\s*[0-9]+\\.\\s+", "", x))
+    all_lists <- lapply(all_lists, function(x) trimws(x))
 
     # Get list lengths
     list_length <- NULL
@@ -299,7 +303,7 @@ var_list <- function(topic,
     ## LLM for adding additional variables
     # Create prompt
     prompt_add <- gsub("\\((variables_)\\)", variables_,
-                       gsub("\\((topic)\\)", topic,
+                       gsub("\\((context)\\)", context,
                             var_prompts$Prompt[4]))
 
     # Create system prompt
@@ -338,7 +342,7 @@ var_list <- function(topic,
                          var_prompts$Prompt[5])
 
     # Create system prompt
-    system_prompt <- gsub("\\((topic)\\)", topic,
+    system_prompt <- gsub("\\((context)\\)", context,
                           var_prompts$Sys.Prompt[5])
 
     # LLM
@@ -366,6 +370,8 @@ var_list <- function(topic,
     #Clean the output text
     split_text <- strsplit(cleaned_vars, split = "\n") # Split the string by newline character
     variables <- lapply(split_text, function(x) sub("^\\s*[0-9]+\\.\\s+", "", x))
+    variables <- lapply(variables, function(x) trimws(x))
+
 
   }, error = function(e) {
     cat(paste0("Warning: Unable to process LLM output -> ", e$message, "."),
@@ -384,7 +390,7 @@ var_list <- function(topic,
         # Create prompt
         prompt_limit_int <- gsub("\\((cleaned_vars)\\)", cleaned_vars,
                                  gsub("\\((n_final)\\)", n_final,
-                                      gsub("\\((topic)\\)", topic,
+                                      gsub("\\((context)\\)", context,
                                            var_prompts$Prompt[6])))
 
         # Create system prompt
@@ -414,6 +420,7 @@ var_list <- function(topic,
         #Clean the output text
         split_text <- strsplit(variables_imp, split = "\n") # Split the string by newline character
         variables_f <- lapply(split_text, function(x) sub("^\\s*[0-9]+\\.\\s+", "", x))
+        variables_f <- lapply(variables_f, function(x) trimws(x))
 
       }, error = function(e) {
         cat(paste0("Warning: Unable to process LLM output -> ", e$message, "."),
@@ -568,6 +575,11 @@ var_list <- function(topic,
 
     # Add final_list to output
     output$final_list <- variables_f[[1]]
+
+    # Include context if include_context = TRUE
+    if (include_context == TRUE) {
+      output$final_list <- c(output$final_list, context)
+    }
 
     if (length(variables[[1]]) > n_final) {
       print("Total of LLM prompts: 6")
