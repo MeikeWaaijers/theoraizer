@@ -176,7 +176,7 @@ causal_relation <- function(context,
 
   #LLM
   for (i in 1:n_pairs) {
-    print(paste0("Variable pair: ", i,  "/", n_pairs))
+    message(sprintf("Variable pair: %d / %d", i, n_pairs))
 
     # Initialize the prompt database
     prompt_database <- list()
@@ -372,7 +372,7 @@ causal_relation <- function(context,
   output$relation_df <- prob_relation_df
 
 
-  print(paste0("Total of LLM prompts: ", n_pairs * 2))
+  message(sprintf("Total of LLM prompts: %d", n_pairs * 2))
 
   # give openai error if there is no output at all
   if (length(output) == 0) {

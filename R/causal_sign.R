@@ -263,7 +263,7 @@ causal_sign <- function(context,
     pair <- 1
 
     for (b in row_index) {
-      print(paste("Variable pair:  ", pair,  "/", length(row_index)))
+      message(sprintf("Variable pair: %d / %d", pair, length(row_index)))
 
       # Initialize the prompt database outside of the loops
       prompt_database <- list()

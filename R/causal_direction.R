@@ -192,7 +192,8 @@ causal_direction <- function(context,
   pair <- 1
 
   for (i in row_index) {
-    print(paste("Variable pair:  ", pair,  "/", n_causal_rela))
+    message(sprintf("Variable pair: %d / %d", pair, n_causal_rela))
+
 
     # Initialize the prompt database
     var1_prompt_database <- list()
@@ -578,7 +579,7 @@ causal_direction <- function(context,
   # Adding relation_df to output
   output$direction_df <- direction_df
 
-  print(paste0("Total of LLM prompts: ", n_causal_rela * 4))
+  message(sprintf("Total of LLM prompts: %d", n_causal_rela * 4))
 
   # give openai error if there is no output at all
   if (length(output) == 0) {

@@ -202,7 +202,8 @@ var_list <- function(context,
 
 
   for (i in 1:2){
-    print(paste0("Variable list: ", i,  "/", 2))
+    message(sprintf("Variable list: %d / %d", i, 2))
+
     prompt <- prompt_database[i]
     system_prompt <- sys_prompt_database[i]
 
@@ -262,7 +263,7 @@ var_list <- function(context,
 
 
   # Integrating lists
-  print(paste0("Integrating lists..."))
+  message("Integrating lists...")
 
   #tryCatch in case processing steps fail the raw output will still be outputted
   tryCatch({
@@ -331,7 +332,7 @@ var_list <- function(context,
 
 
   ## Clean up variable list
-  print(paste0("Cleaning up integrated list..."))
+  message("Cleaning up integrated list...")
 
   #tryCatch in case processing steps fail the raw output will still be outputted
   tryCatch({
@@ -382,7 +383,7 @@ var_list <- function(context,
     ## LLM for limiting the final list to a list with the most ... important variables
     if (length(variables[[1]]) > n_final) {
 
-      print(paste0("Selecting the ", n_final, " most important variables..."))
+      message(sprintf("Selecting the %d most important variables...", n_final))
 
       #tryCatch in case processing steps fail the raw output will still be outputted
       tryCatch({
@@ -582,10 +583,10 @@ var_list <- function(context,
     }
 
     if (length(variables[[1]]) > n_final) {
-      print("Total of LLM prompts: 6")
+      message("Total of LLM prompts: 6")
 
     } else {
-      print("Total of LLM prompts: 5")
+      message("Total of LLM prompts: 5")
 
     }
   }, error = function(e) {
