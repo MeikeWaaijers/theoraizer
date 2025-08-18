@@ -4,8 +4,8 @@
 \alias{var_list}
 \title{Create a Variable List}
 \usage{
-var_list(context,
-         include_context = FALSE,
+var_list(topic,
+         include_topic = FALSE,
          n_final = Inf,
          n_variables = "all",
          LLM_model = "gpt-4o",
@@ -13,9 +13,9 @@ var_list(context,
          update_key = FALSE)
 }
 \arguments{
-\item{context}{A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the argument can be set to NULL.}
+\item{topic}{A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.}
 
-\item{include_context}{If \code{include_context = FALSE} (default), the context specified in the \code{"context"} argument will not be included as a seperate variable in the variable list.}
+\item{include_topic}{If \code{include_topic = FALSE} (default), the topic specified in the \code{"topic"} argument will not be included as a seperate variable in the variable list.}
 
 \item{n_final}{Number of variables to be included in the final variable list. If \code{inf} (default), the final integrated variable list will not be limited to a certain number of variables.}
 
@@ -48,7 +48,7 @@ var_list(context,
 }
 }
 \description{
-In \code{var_list()} a Large Language Model (LLM) is instructed to generate a list of important variables for a particular context.
+In \code{var_list()} a Large Language Model (LLM) is instructed to generate a list of important variables for a particular topic.
 
 The function prompts a LLM to compile two lists of variables with 2 different prompts.
 The LLM is instructed to include only variables that are precisely defined and measured on a binary or continuous scale.
@@ -68,7 +68,7 @@ The function and its output should be approached with caution. Depending on the 
 \examples{
 \dontrun{
 # For a readily available, pre-made output example see: data("vars")
-vars <- var_list(context = "addiction",
+vars <- var_list(topic = "addiction",
                  n_final = 10,
                  n_variables = "all")
 }

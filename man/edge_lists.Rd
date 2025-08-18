@@ -48,7 +48,7 @@ Generated using the OpenAI platform: \url{https://platform.openai.com}
 edge_lists
 }
 \description{
-This data set contains a list of 4 edge lists related to the context of addiction.
+This data set contains a list of 4 edge lists related to the topic of addiction.
 The data was generated using the \code{\link{cld_plot}} function and the "gpt-4o" Large Language Model (LLM).
 }
 \examples{

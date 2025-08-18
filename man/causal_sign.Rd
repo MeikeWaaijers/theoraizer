@@ -4,7 +4,7 @@
 \alias{causal_sign}
 \title{Identify the Sign of Causal Relationships}
 \usage{
-causal_sign(context,
+causal_sign(topic,
             prob_df,
             causal_threshold = 50,
             LLM_model = "gpt-4o",
@@ -12,7 +12,7 @@ causal_sign(context,
             update_key = FALSE)
 }
 \arguments{
-\item{context}{A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the argument can be set to NULL.}
+\item{topic}{A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.}
 
 \item{prob_df}{Two different probability dataframes can be inputted:
 \itemize{
@@ -108,7 +108,7 @@ The function and its output should be approached with caution. Depending on the 
 }
 \examples{
 \dontrun{
-## Example input (context = "addiction")
+## Example input (topic = "addiction")
 # Relation probability dataframe input
 data("rel")
 rel$relation_df
@@ -120,7 +120,7 @@ dir$direction_df
 #---------------------------------------------------------------------------
 ## Create sign dataframe for a relation probability dataframe
 # For a readily available, pre-made output example see: data("rel_sign")
-rel_sign <- causal_sign(context = "addiction",
+rel_sign <- causal_sign(topic = "addiction",
                         prob_df = rel$relation_df)
 
 # Check output
@@ -129,7 +129,7 @@ rel_sign$sign_df
 #---------------------------------------------------------------------------
 ## Create sign dataframe for a direction probability dataframe
 # For a readily available, pre-made output example see: data("dir_sign")
-dir_sign <- causal_sign(context = "addiction",
+dir_sign <- causal_sign(topic = "addiction",
                         prob_df = dir$direction_df)
 
 # Check output

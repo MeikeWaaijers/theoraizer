@@ -5,7 +5,7 @@ library(theoraizer)
 test_that("causal_relation() works", {
   skip_on_cran()
   vcr::use_cassette("causal_relation", {
-    rel <- theoraizer::causal_relation(context = "addiction",
+    rel <- theoraizer::causal_relation(topic = "addiction",
                                        variable_list = theoraizer::vars$final_list[1:2])
 
   })
@@ -32,16 +32,16 @@ test_that("causal_relation() works", {
 })
 
 
-test_that("Invalid context parameter causes error", {
-  testthat::expect_error(theoraizer::causal_relation(context = 123,
+test_that("Invalid topic parameter causes error", {
+  testthat::expect_error(theoraizer::causal_relation(topic = 123,
                                                      variable_list = c("CO2", "Temperature", "Sea Level"),
                                                      LLM_model = "gpt-4",
                                                      max_tokens = 1000),
-                         "'context' should be a character string or NULL.")
+                         "'topic' should be a character string or NULL.")
 })
 
 test_that("Invalid variable_list parameter causes error", {
-  testthat::expect_error(theoraizer::causal_relation(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_relation(topic = "Climate Change",
                                                      variable_list = "not_a_vector",
                                                      LLM_model = "gpt-4",
                                                      max_tokens = 1000),
@@ -49,7 +49,7 @@ test_that("Invalid variable_list parameter causes error", {
 })
 
 test_that("Invalid entries in variable_list cause error", {
-  testthat::expect_error(theoraizer::causal_relation(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_relation(topic = "Climate Change",
                                                      variable_list = list(123, "Temperature", "Sea Level"),
                                                      LLM_model = "gpt-4",
                                                      max_tokens = 1000),
@@ -57,7 +57,7 @@ test_that("Invalid entries in variable_list cause error", {
 })
 
 test_that("Invalid LLM_model parameter causes error", {
-  testthat::expect_error(theoraizer::causal_relation(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_relation(topic = "Climate Change",
                                                      variable_list = c("CO2", "Temperature", "Sea Level"),
                                                      LLM_model = "invalid_model",
                                                      max_tokens = 1000),
@@ -65,7 +65,7 @@ test_that("Invalid LLM_model parameter causes error", {
 })
 
 test_that("Invalid max_tokens parameter causes error for gpt-4o", {
-  testthat::expect_error(theoraizer::causal_relation(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_relation(topic = "Climate Change",
                                                      variable_list = c("CO2", "Temperature", "Sea Level"),
                                                      LLM_model = "gpt-4o",
                                                      max_tokens = 7000),
@@ -73,7 +73,7 @@ test_that("Invalid max_tokens parameter causes error for gpt-4o", {
 })
 
 test_that("Invalid max_tokens parameter causes error for gpt-3.5-turbo", {
-  testthat::expect_error(theoraizer::causal_relation(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_relation(topic = "Climate Change",
                                                      variable_list = c("CO2", "Temperature", "Sea Level"),
                                                      LLM_model = "gpt-3.5-turbo",
                                                      max_tokens = "4000"),

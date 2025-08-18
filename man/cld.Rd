@@ -4,7 +4,7 @@
 \alias{cld}
 \title{Quickly create a CLD using a LLM}
 \usage{
-cld(context,
+cld(topic,
     variable_list,
     plot = TRUE,
     LLM_model = "gpt-4o",
@@ -12,7 +12,7 @@ cld(context,
     update_key = FALSE)
 }
 \arguments{
-\item{context}{A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the parameter can be set to NULL.}
+\item{topic}{A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the parameter can be set to NULL.}
 
 \item{variable_list}{A vector containing all variables that need to be included in the theory.}
 
@@ -88,7 +88,7 @@ The function and its output should be approached with caution. Depending on the 
 }
 \examples{
 \dontrun{
-## Example input (context = "addiction")
+## Example input (topic = "addiction")
 data("vars")
 vars$final_list
 
@@ -96,7 +96,7 @@ vars$final_list
 ## Default
 # For a readily available, pre-made output example see: data("cld_example")
 
-cld_example <- cld(context = "addiction",
+cld_example <- cld(topic = "addiction",
                    variable_list = vars$final_list)
 
 # Check output

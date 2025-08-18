@@ -41,7 +41,7 @@ rel
 }
 \description{
 This data set contains the probabilities of the presence of
-causal relationships between various variables related to the context of addiction.
+causal relationships between various variables related to the topic of addiction.
 The data was generated using the \code{\link{causal_relation}} function and the "gpt-4o" Large Language Model (LLM).
 }
 \examples{

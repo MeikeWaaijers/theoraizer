@@ -56,7 +56,7 @@ Generated using the OpenAI platform: \url{https://platform.openai.com}
 cld_example
 }
 \description{
-This data set contains an edge lists related to the context of addiction.
+This data set contains an edge lists related to the topic of addiction.
 The data was generated using the \code{\link{cld}} function and the "gpt-4o" Large Language Model (LLM).
 }
 \examples{

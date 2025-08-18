@@ -5,7 +5,7 @@ library(theoraizer)
 test_that("causal_direction() works", {
   skip_on_cran()
   vcr::use_cassette("causal_direction", {
-    dir <- theoraizer::causal_direction(context = "addiction",
+    dir <- theoraizer::causal_direction(topic = "addiction",
                                         relation_df = theoraizer::rel$relation_df[1,])
 
   })
@@ -34,18 +34,18 @@ test_that("causal_direction() works", {
                               "prob_var2_cause") %in% names(dir$direction_df)))
 })
 
-test_that("Invalid context parameter causes error", {
+test_that("Invalid topic parameter causes error", {
   relation_df <- data.frame(var1 = c("A", "B"), var2 = c("B", "C"), prob_causal = c(60, 70))
-  testthat::expect_error(theoraizer::causal_direction(context = 123,
+  testthat::expect_error(theoraizer::causal_direction(topic = 123,
                                                       relation_df = relation_df,
                                                       causal_threshold = 50,
                                                       LLM_model = "gpt-4",
                                                       max_tokens = 1000),
-                         "'context' should be a character string or NULL.")
+                         "'topic' should be a character string or NULL.")
 })
 
 test_that("Invalid relation_df parameter causes error", {
-  testthat::expect_error(theoraizer::causal_direction(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_direction(topic = "Climate Change",
                                                       relation_df = "not_a_dataframe",
                                                       causal_threshold = 50,
                                                       LLM_model = "gpt-4",
@@ -55,7 +55,7 @@ test_that("Invalid relation_df parameter causes error", {
 
 test_that("Invalid columns in relation_df cause error", {
   relation_df <- data.frame(a = c("A", "B"), b = c("B", "C"), c = c(60, 70))
-  testthat::expect_error(theoraizer::causal_direction(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_direction(topic = "Climate Change",
                                                       relation_df = relation_df,
                                                       causal_threshold = 50,
                                                       LLM_model = "gpt-4",
@@ -65,7 +65,7 @@ test_that("Invalid columns in relation_df cause error", {
 
 test_that("Invalid causal_threshold parameter causes error", {
   relation_df <- data.frame(var1 = c("A", "B"), var2 = c("B", "C"), prob_causal = c(60, 70))
-  testthat::expect_error(theoraizer::causal_direction(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_direction(topic = "Climate Change",
                                                       relation_df = relation_df,
                                                       causal_threshold = -10,
                                                       LLM_model = "gpt-4",
@@ -75,7 +75,7 @@ test_that("Invalid causal_threshold parameter causes error", {
 
 test_that("Invalid LLM_model parameter causes error", {
   relation_df <- data.frame(var1 = c("A", "B"), var2 = c("B", "C"), prob_causal = c(60, 70))
-  testthat::expect_error(theoraizer::causal_direction(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_direction(topic = "Climate Change",
                                                       relation_df = relation_df,
                                                       causal_threshold = 50,
                                                       LLM_model = "invalid_model",
@@ -85,7 +85,7 @@ test_that("Invalid LLM_model parameter causes error", {
 
 test_that("Invalid max_tokens parameter causes error for gpt-4o", {
   relation_df <- data.frame(var1 = c("A", "B"), var2 = c("B", "C"), prob_causal = c(60, 70))
-  testthat::expect_error(theoraizer::causal_direction(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_direction(topic = "Climate Change",
                                                       relation_df = relation_df,
                                                       causal_threshold = 50,
                                                       LLM_model = "gpt-4o",
@@ -95,7 +95,7 @@ test_that("Invalid max_tokens parameter causes error for gpt-4o", {
 
 test_that("Invalid max_tokens parameter causes error for gpt-3.5-turbo", {
   relation_df <- data.frame(var1 = c("A", "B"), var2 = c("B", "C"), prob_causal = c(60, 70))
-  testthat::expect_error(theoraizer::causal_direction(context = "Climate Change",
+  testthat::expect_error(theoraizer::causal_direction(topic = "Climate Change",
                                                       relation_df = relation_df,
                                                       causal_threshold = 50,
                                                       LLM_model = "gpt-3.5-turbo",

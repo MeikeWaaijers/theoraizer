@@ -4,7 +4,7 @@
 \alias{causal_direction}
 \title{Identify the Direction of Causal Relationships}
 \usage{
-causal_direction(context,
+causal_direction(topic,
                  relation_df,
                  causal_threshold = 50,
                  LLM_model = "gpt-4o",
@@ -12,7 +12,7 @@ causal_direction(context,
                  update_key = FALSE)
 }
 \arguments{
-\item{context}{A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the argument can be set to NULL.}
+\item{topic}{A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.}
 
 \item{relation_df}{A dataframe with a unique pair of variables on each row and the probability of the existence of a causal relationship between these variables. (The \code{relation_df} output of the \code{\link{causal_relation}} function).}
 
@@ -66,14 +66,14 @@ The function and its output should be approached with caution. Depending on the 
 }
 \examples{
 \dontrun{
-## Example input (context = "addiction")
+## Example input (topic = "addiction")
 data("rel")
 rel$relation_df
 
 #---------------------------------------------------------------------------
 ## Default
 # For a readily available, pre-made output example see: data("dir")
-dir <- causal_direction(context = "addiction",
+dir <- causal_direction(topic = "addiction",
                         relation_df = rel$relation_df)
 
 # Check output

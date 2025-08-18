@@ -1,5 +1,5 @@
 # Program Name: theoraizer
-# Description: This data set contains an edge list related to the context of addiction. The data was generated using the "gpt-4o" Large Language Model (LLM).
+# Description: This data set contains an edge list related to the topic of addiction. The data was generated using the "gpt-4o" Large Language Model (LLM).
 # Copyright (C) <2024> <Meike Waaijers>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@
 
 #' cld_example data
 #'
-#' This data set contains an edge lists related to the context of addiction.
+#' This data set contains an edge lists related to the topic of addiction.
 #' The data was generated using the \code{\link{cld}} function and the "gpt-4o" Large Language Model (LLM).
 #'
 #' @format A list containing the following components:

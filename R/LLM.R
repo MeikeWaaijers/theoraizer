@@ -184,9 +184,67 @@ LLM <- function(prompt = prompt,
     raw_content <- content <- httr::content(request)
     output <- content$choices[[1]]$message$content
 
+  } else if (LLM_model == "gpt-4.1") {
+    logprob = FALSE
+
+    api_key <- get_api_key("openai",
+                           update_key = update_key)
+
+    # API endpoint
+    endpoint <- "https://api.openai.com/v1/responses"
+
+    # Request body
+    request_body <- list(
+      model = LLM_model,
+      tools = list(list(type = "web_search_preview")),
+      max_output_tokens = max_tokens,
+      temperature = temperature,
+      # n = 1,
+      # suffix = suffix,
+      # top_p = top_p,
+      # stop = stop,
+      # presence_penalty = presence_penalty,
+      # frequency_penalty = frequency_penalty,
+      input = prompt
+    )
+
+
+    # Make the API request
+    request <- httr::RETRY(verb = "POST",
+                           url = endpoint,
+                           body = request_body,
+                           httr::add_headers(Authorization = paste("Bearer",
+                                                                   api_key)),
+                           encode = "json",
+                           times = 5,
+                           httr::timeout(timeout_sec))
+
+    # Extract the response
+    raw_content <- content <- httr::content(request)
+    output <- content$output[[2]]$content[[1]]$text
+
+    n_sources <- length(raw_content$output[[2]]$content[[1]]$annotations)
+
+    sources <- NULL
+    for (i in 1:n_sources) {
+      sources[i] <- content$output[[2]]$content[[1]]$annotations[[i]]$url
+
+    }
+
   }
 
-  if (raw_output == TRUE && logprobs == TRUE){
+  if (LLM_model == "gpt-4.1") {
+    output <- list(raw_content = list(LLM_model = raw_content$model,
+                                      content = raw_content$output[[2]]$content[[1]]$text,
+                                      finish_reason = raw_content$output[[2]]$status,
+                                      prompt_tokens = raw_content$usage$input_tokens,
+                                      answer_tokens = raw_content$usage$output_tokens,
+                                      total_tokens = raw_content$usage$total_tokens,
+                                      error = raw_content$error),
+                   sources = sources,
+                   output = output)
+
+  } else if (raw_output == TRUE && logprobs == TRUE) {
     top5_logprobs <- LLM_logprobs(raw_content = raw_content,
                                   LLM_model = LLM_model)
     output <- list(raw_content = list(LLM_model = raw_content$model,
@@ -215,6 +273,7 @@ LLM <- function(prompt = prompt,
                                   LLM_model = LLM_model)
     output <- list(top5_tokens = top5_logprobs,
                    output = output)
+
 
   }
 

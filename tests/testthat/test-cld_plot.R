@@ -14,7 +14,7 @@ valid_dir_sign_df <- data.frame(var1 = c("A", "B"), var2 = c("B", "C"), prob_cau
 
 
 test_that("cld_plot() work correctly", {
-  output <- theoraizer::cld_plot(context = "Test context",
+  output <- theoraizer::cld_plot(topic = "Test topic",
                                  relation_df = valid_relation_df,
                                  direction_df = valid_direction_df,
                                  rel_sign_df = valid_rel_sign_df,
@@ -44,7 +44,7 @@ test_that("cld_plot() work correctly", {
 
 
 test_that("cld_plot() works with only one dataframe input", {
-  output <- theoraizer::cld_plot(context = "Test context",
+  output <- theoraizer::cld_plot(topic = "Test topic",
                                  relation_df = valid_relation_df
   )
   testthat::expect_true(is.list(output))
@@ -52,13 +52,13 @@ test_that("cld_plot() works with only one dataframe input", {
 })
 
 test_that("Invalid input causes error", {
-  testthat::expect_error(theoraizer::cld_plot(context = "Test context",
+  testthat::expect_error(theoraizer::cld_plot(topic = "Test topic",
                                               relation_df = invalid_relation_df
   ), "All entries in 'relation_df\\$prob_causal' should be numeric and between 0 and 100.")
 })
 
-test_that("Null context is handled", {
-  output <- theoraizer::cld_plot(context = NULL,
+test_that("Null topic is handled", {
+  output <- theoraizer::cld_plot(topic = NULL,
                                  relation_df = valid_relation_df
   )
   testthat::expect_true(is.list(output))
@@ -66,21 +66,21 @@ test_that("Null context is handled", {
 })
 
 test_that("Invalid plot parameter causes error", {
-  testthat::expect_error(theoraizer::cld_plot(context = "Test context",
+  testthat::expect_error(theoraizer::cld_plot(topic = "Test topic",
                                               relation_df = valid_relation_df,
                                               plot = "not_logical"
   ), "'plot' should be a logical value.")
 })
 
 test_that("Layout parameter validation", {
-  testthat::expect_error(theoraizer::cld_plot(context = "Test context",
+  testthat::expect_error(theoraizer::cld_plot(topic = "Test topic",
                                               relation_df = valid_relation_df,
                                               layout = "not_valid_layout"
   ), "'layout' should be either 'average' or 'circle'.")
 })
 
 test_that("Valid direction_df works correctly", {
-  output <- theoraizer::cld_plot(context = "Test context",
+  output <- theoraizer::cld_plot(topic = "Test topic",
                                  direction_df = valid_direction_df
   )
   testthat::expect_true(is.list(output))
@@ -88,7 +88,7 @@ test_that("Valid direction_df works correctly", {
 })
 
 test_that("Valid rel_sign_df works correctly", {
-  output <- theoraizer::cld_plot(context = "Test context",
+  output <- theoraizer::cld_plot(topic = "Test topic",
                                  rel_sign_df = valid_rel_sign_df
   )
   testthat::expect_true(is.list(output))
@@ -96,7 +96,7 @@ test_that("Valid rel_sign_df works correctly", {
 })
 
 test_that("Valid dir_sign_df works correctly", {
-  output <- theoraizer::cld_plot(context = "Test context",
+  output <- theoraizer::cld_plot(topic = "Test topic",
                                  dir_sign_df = valid_dir_sign_df
   )
   testthat::expect_true(is.list(output))
@@ -104,7 +104,7 @@ test_that("Valid dir_sign_df works correctly", {
 })
 
 test_that("Combine parameter is handled", {
-  output <- theoraizer::cld_plot(context = "Test context",
+  output <- theoraizer::cld_plot(topic = "Test topic",
                                  direction_df = valid_direction_df,
                                  combine = FALSE
   )

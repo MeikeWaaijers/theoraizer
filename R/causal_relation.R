@@ -27,7 +27,7 @@
 #' \code{causal_relation()} will generate all possible unique pairs of variables (e.g. 4 variables will give 5 * (5 - 1) / 2 = 10 unique pairs). It will then iterate through all these pairs and ask a Large Language Model (LLM) to indicate whether there is a causal or non-causal relationship between the variables.
 #'
 #' @usage
-#' causal_relation(context,
+#' causal_relation(topic,
 #'                 variable_list,
 #'                 LLM_model = "gpt-4o",
 #'                 max_tokens = 2000,
@@ -37,7 +37,7 @@
 #'
 #' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}}
 #'
-#' @param context A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the argument can be set to NULL.
+#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
 #' @param variable_list A vector containing all variables that need to be included in the theory.
 #' @inheritParams var_list
 #'
@@ -81,14 +81,14 @@
 #'
 #' @examples
 #' \dontrun{
-#' ## Example input (context = "addiction")
+#' ## Example input (topic = "addiction")
 #' data("vars")
 #' vars$final_list
 #'
 #' #---------------------------------------------------------------------------
 #' ## Default
 #' # For a readily available, pre-made output example see: data("rel")
-#' rel <- causal_relation(context = "addiction",
+#' rel <- causal_relation(topic = "addiction",
 #'                        variable_list = vars$final_list)
 #'
 #' # Check output
@@ -101,14 +101,14 @@
 
 
 ## causal_relation function
-causal_relation <- function(context,
+causal_relation <- function(topic,
                             variable_list,
                             LLM_model = "gpt-4o",
                             max_tokens = 2000,
                             update_key = FALSE) {
 
   #validate input
-  stopifnot("'context' should be a character string or NULL." = is.character(context) | is.null(context))
+  stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
   stopifnot("'variable_list' should be a vector containing more than one variables." = is.vector(variable_list) && length(variable_list) > 1)
   stopifnot("All entries in 'variable_list' should be character strings." =
               all(sapply(variable_list, is.character)))
@@ -183,7 +183,7 @@ causal_relation <- function(context,
 
     for (g in 1:2) {
       if (length(prompt_database) == 0) {
-        if (is.null(context)) {
+        if (is.null(topic)) {
           # Create optional prompts
           prompt1 <- gsub("\\((pairs_df\\[i, 1\\])\\)", pairs_df[i, 1],
                           gsub("\\((pairs_df\\[i, 2\\])\\)", pairs_df[i, 2],
@@ -197,12 +197,12 @@ causal_relation <- function(context,
           # Create optional prompts
           prompt1 <- gsub("\\((pairs_df\\[i, 1\\])\\)", pairs_df[i, 1],
                           gsub("\\((pairs_df\\[i, 2\\])\\)", pairs_df[i, 2],
-                               gsub("\\((context)\\)", context,
+                               gsub("\\((topic)\\)", topic,
                                     rel_prompts$Prompt[3])))
 
           prompt2 <- gsub("\\((pairs_df\\[i, 2\\])\\)", pairs_df[i, 2],
                           gsub("\\((pairs_df\\[i, 1\\])\\)", pairs_df[i, 1],
-                               gsub("\\((context)\\)", context,
+                               gsub("\\((topic)\\)", topic,
                                     rel_prompts$Prompt[4])))
 
         }

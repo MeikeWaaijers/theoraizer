@@ -5,7 +5,7 @@ library(theoraizer)
 test_that("var_list() works", {
   skip_on_cran()
   vcr::use_cassette("var_list", {
-    vars <- theoraizer::var_list(context = "addiction",
+    vars <- theoraizer::var_list(topic = "addiction",
                                  n_final = 2,
                                  n_variables = 2)
   })
@@ -29,17 +29,17 @@ test_that("var_list() works", {
   testthat::expect_equal(length(vars$final_list), 2)
 })
 
-test_that("Invalid context parameter causes error", {
-  testthat::expect_error(theoraizer::var_list(context = 123,
+test_that("Invalid topic parameter causes error", {
+  testthat::expect_error(theoraizer::var_list(topic = 123,
                                               n_final = 5,
                                               n_variables = 10,
                                               LLM_model = "gpt-4",
                                               max_tokens = 1000),
-                         "'context' should be a character string.")
+                         "'topic' should be a character string.")
 })
 
 test_that("Invalid n_variables parameter causes error", {
-  testthat::expect_error(theoraizer::var_list(context = "Climate Change",
+  testthat::expect_error(theoraizer::var_list(topic = "Climate Change",
                                               n_final = 5,
                                               n_variables = -1,
                                               LLM_model = "gpt-4",
@@ -48,7 +48,7 @@ test_that("Invalid n_variables parameter causes error", {
 })
 
 test_that("Invalid n_final parameter causes error", {
-  testthat::expect_error(theoraizer::var_list(context = "Climate Change",
+  testthat::expect_error(theoraizer::var_list(topic = "Climate Change",
                                               n_final = -5,
                                               n_variables = 10,
                                               LLM_model = "gpt-4",
@@ -57,7 +57,7 @@ test_that("Invalid n_final parameter causes error", {
 })
 
 test_that("Invalid LLM_model parameter causes error", {
-  testthat::expect_error(theoraizer::var_list(context = "Climate Change",
+  testthat::expect_error(theoraizer::var_list(topic = "Climate Change",
                                               n_final = 5,
                                               n_variables = 10,
                                               LLM_model = "invalid_model",
@@ -66,7 +66,7 @@ test_that("Invalid LLM_model parameter causes error", {
 })
 
 test_that("Invalid max_tokens parameter causes error for gpt-4o", {
-  testthat::expect_error(theoraizer::var_list(context = "Climate Change",
+  testthat::expect_error(theoraizer::var_list(topic = "Climate Change",
                                               n_final = 5,
                                               n_variables = 10,
                                               LLM_model = "gpt-4o",
@@ -75,7 +75,7 @@ test_that("Invalid max_tokens parameter causes error for gpt-4o", {
 })
 
 test_that("Invalid max_tokens parameter causes error for gpt-3.5-turbo", {
-  testthat::expect_error(theoraizer::var_list(context = "Climate Change",
+  testthat::expect_error(theoraizer::var_list(topic = "Climate Change",
                                               n_final = 5,
                                               n_variables = 10,
                                               LLM_model = "gpt-3.5-turbo",

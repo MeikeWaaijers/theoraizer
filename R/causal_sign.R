@@ -27,7 +27,7 @@
 #' In \code{causal_sign()} a Large Language Model (LLM) is asked to determine whether a causal relationship is positive or negative. This is achieved by asking the LLM how an increase or decrease in one variable affects the other variable.
 #'
 #' @usage
-#' causal_sign(context,
+#' causal_sign(topic,
 #'             prob_df,
 #'             causal_threshold = 50,
 #'             LLM_model = "gpt-4o",
@@ -38,7 +38,7 @@
 #'
 #' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}}
 #'
-#' @param context A character vector specifying the context for which a theory should be developed. If it is not feasible to identify a particular context, the argument can be set to NULL.
+#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
 #' @param prob_df Two different probability dataframes can be inputted:
 #' \itemize{
 #'   \item A dataframe with 3 columns and on every row a unique variable pair and the probability of the presence of a causal relationship between these variables (The \code{relation_df} output from the \code{\link{causal_relation}} function).
@@ -129,7 +129,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' ## Example input (context = "addiction")
+#' ## Example input (topic = "addiction")
 #' # Relation probability dataframe input
 #' data("rel")
 #' rel$relation_df
@@ -141,7 +141,7 @@
 #' #---------------------------------------------------------------------------
 #' ## Create sign dataframe for a relation probability dataframe
 #' # For a readily available, pre-made output example see: data("rel_sign")
-#' rel_sign <- causal_sign(context = "addiction",
+#' rel_sign <- causal_sign(topic = "addiction",
 #'                         prob_df = rel$relation_df)
 #'
 #' # Check output
@@ -150,7 +150,7 @@
 #' #---------------------------------------------------------------------------
 #' ## Create sign dataframe for a direction probability dataframe
 #' # For a readily available, pre-made output example see: data("dir_sign")
-#' dir_sign <- causal_sign(context = "addiction",
+#' dir_sign <- causal_sign(topic = "addiction",
 #'                         prob_df = dir$direction_df)
 #'
 #' # Check output
@@ -163,7 +163,7 @@
 
 
 ## causal_sign function
-causal_sign <- function(context,
+causal_sign <- function(topic,
                         prob_df,
                         causal_threshold = 50,
                         LLM_model = "gpt-4o",
@@ -171,7 +171,7 @@ causal_sign <- function(context,
                         update_key = FALSE) {
 
   #validate input
-  stopifnot("'context' should be a character string or NULL." = is.character(context) | is.null(context))
+  stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
   stopifnot("'causal_threshold' should be a number between 0 and 100, and cannot have more than two decimal points." =
               is.numeric(causal_threshold) && causal_threshold >= 0 && causal_threshold <= 100 && round(causal_threshold, 2) == causal_threshold)
   stopifnot("'prob_df' should be a dataframe." = is.data.frame(prob_df))
@@ -271,7 +271,7 @@ causal_sign <- function(context,
 
       for (c in 1:8) {
         if (length(prompt_database) == 0) {
-          if (is.null(context)){
+          if (is.null(topic)){
             # Create 8 prompts
             prompt1 <- gsub("\\((var_1\\[b\\])\\)", var_1[b],
                             gsub("\\((var_2\\[b\\])\\)", var_2[b],
@@ -300,35 +300,35 @@ causal_sign <- function(context,
 
           } else {
             # Create 8 prompts
-            prompt1 <- gsub("\\((context)\\)", context,
+            prompt1 <- gsub("\\((topic)\\)", topic,
                             gsub("\\((var_1\\[b\\])\\)", var_1[b],
                                  gsub("\\((var_2\\[b\\])\\)", var_2[b],
                                       sign_prompts$Prompt[9])))
-            prompt2 <- gsub("\\((context)\\)", context,
+            prompt2 <- gsub("\\((topic)\\)", topic,
                             gsub("\\((var_1\\[b\\])\\)", var_1[b],
                                  gsub("\\((var_2\\[b\\])\\)", var_2[b],
                                       sign_prompts$Prompt[10])))
-            prompt3 <- gsub("\\((context)\\)", context,
+            prompt3 <- gsub("\\((topic)\\)", topic,
                             gsub("\\((var_1\\[b\\])\\)", var_1[b],
                                  gsub("\\((var_2\\[b\\])\\)", var_2[b],
                                       sign_prompts$Prompt[11])))
-            prompt4 <- gsub("\\((context)\\)", context,
+            prompt4 <- gsub("\\((topic)\\)", topic,
                             gsub("\\((var_1\\[b\\])\\)", var_1[b],
                                  gsub("\\((var_2\\[b\\])\\)", var_2[b],
                                       sign_prompts$Prompt[12])))
-            prompt5 <- gsub("\\((context)\\)", context,
+            prompt5 <- gsub("\\((topic)\\)", topic,
                             gsub("\\((var_2\\[b\\])\\)", var_2[b],
                                  gsub("\\((var_1\\[b\\])\\)", var_1[b],
                                       sign_prompts$Prompt[13])))
-            prompt6 <- gsub("\\((context)\\)", context,
+            prompt6 <- gsub("\\((topic)\\)", topic,
                             gsub("\\((var_2\\[b\\])\\)", var_2[b],
                                  gsub("\\((var_1\\[b\\])\\)", var_1[b],
                                       sign_prompts$Prompt[14])))
-            prompt7 <- gsub("\\((context)\\)", context,
+            prompt7 <- gsub("\\((topic)\\)", topic,
                             gsub("\\((var_2\\[b\\])\\)", var_2[b],
                                  gsub("\\((var_1\\[b\\])\\)", var_1[b],
                                       sign_prompts$Prompt[15])))
-            prompt8 <- gsub("\\((context)\\)", context,
+            prompt8 <- gsub("\\((topic)\\)", topic,
                             gsub("\\((var_2\\[b\\])\\)", var_2[b],
                                  gsub("\\((var_1\\[b\\])\\)", var_1[b],
                                       sign_prompts$Prompt[16])))
@@ -342,7 +342,7 @@ causal_sign <- function(context,
 
         prompt <- prompt_database[[c]]
 
-        if (is.null(context)) {
+        if (is.null(topic)) {
           # Create 2 system prompts
           system_prompt1 <- sign_prompts$Sys.Prompt[1]
           system_prompt2 <- sign_prompts$Sys.Prompt[2]
@@ -532,7 +532,7 @@ causal_sign <- function(context,
 
       for (g in 1:4) {
         if (length(var1_prompt_database) == 0) {
-          if (is.null(context)) {
+          if (is.null(topic)) {
             # Create 8 prompts for var 1
             var1_prompt1 <- gsub("\\((var_1\\[i\\])\\)", var_1[i],
                                  gsub("\\((var_2\\[i\\])\\)", var_2[i],
@@ -549,19 +549,19 @@ causal_sign <- function(context,
 
           } else {
             # Create 8 prompts for var 1
-            var1_prompt1 <- gsub("\\((context)\\)", context,
+            var1_prompt1 <- gsub("\\((topic)\\)", topic,
                                  gsub("\\((var_1\\[i\\])\\)", var_1[i],
                                       gsub("\\((var_2\\[i\\])\\)", var_2[i],
                                            sign_prompts$Prompt[21])))
-            var1_prompt2 <- gsub("\\((context)\\)", context,
+            var1_prompt2 <- gsub("\\((topic)\\)", topic,
                                  gsub("\\((var_1\\[i\\])\\)", var_1[i],
                                       gsub("\\((var_2\\[i\\])\\)", var_2[i],
                                            sign_prompts$Prompt[22])))
-            var1_prompt3 <- gsub("\\((context)\\)", context,
+            var1_prompt3 <- gsub("\\((topic)\\)", topic,
                                  gsub("\\((var_1\\[i\\])\\)", var_1[i],
                                       gsub("\\((var_2\\[i\\])\\)", var_2[i],
                                            sign_prompts$Prompt[23])))
-            var1_prompt4 <- gsub("\\((context)\\)", context,
+            var1_prompt4 <- gsub("\\((topic)\\)", topic,
                                  gsub("\\((var_1\\[i\\])\\)", var_1[i],
                                       gsub("\\((var_2\\[i\\])\\)", var_2[i],
                                            sign_prompts$Prompt[24])))
@@ -579,7 +579,7 @@ causal_sign <- function(context,
         var1_prompt <- var1_prompt_database[[g]]
 
 
-        if (is.null(context)) {
+        if (is.null(topic)) {
           # Create 2 system prompts
           system_prompt1 <- sign_prompts$Sys.Prompt[1]
           system_prompt2 <- sign_prompts$Sys.Prompt[2]
@@ -637,7 +637,7 @@ causal_sign <- function(context,
 
       for (k in 1:4) {
         if (length(var2_prompt_database) == 0) {
-          if (is.null(context)) {
+          if (is.null(topic)) {
             # Create 4 prompts for var 2
             var2_prompt1 <- gsub("\\((var_2\\[l\\])\\)", var_2[l],
                                  gsub("\\((var_1\\[l\\])\\)", var_1[l],
@@ -655,19 +655,19 @@ causal_sign <- function(context,
 
           } else {
             # Create 4 prompts for var 2
-            var2_prompt1 <- gsub("\\((context)\\)", context,
+            var2_prompt1 <- gsub("\\((topic)\\)", topic,
                                  gsub("\\((var_2\\[l\\])\\)", var_2[l],
                                       gsub("\\((var_1\\[l\\])\\)", var_1[l],
                                            sign_prompts$Prompt[29])))
-            var2_prompt2 <- gsub("\\((context)\\)", context,
+            var2_prompt2 <- gsub("\\((topic)\\)", topic,
                                  gsub("\\((var_2\\[l\\])\\)", var_2[l],
                                       gsub("\\((var_1\\[l\\])\\)", var_1[l],
                                            sign_prompts$Prompt[30])))
-            var2_prompt3 <- gsub("\\((context)\\)", context,
+            var2_prompt3 <- gsub("\\((topic)\\)", topic,
                                  gsub("\\((var_2\\[l\\])\\)", var_2[l],
                                       gsub("\\((var_1\\[l\\])\\)", var_1[l],
                                            sign_prompts$Prompt[31])))
-            var2_prompt4 <- gsub("\\((context)\\)", context,
+            var2_prompt4 <- gsub("\\((topic)\\)", topic,
                                  gsub("\\((var_2\\[l\\])\\)", var_2[l],
                                       gsub("\\((var_1\\[l\\])\\)", var_1[l],
                                            sign_prompts$Prompt[32])))
@@ -684,7 +684,7 @@ causal_sign <- function(context,
         var2_prompt <- var2_prompt_database[[k]]
 
 
-        if (is.null(context)) {
+        if (is.null(topic)) {
           # Create 2 system prompts
           system_prompt1 <- sign_prompts$Sys.Prompt[1]
           system_prompt2 <- sign_prompts$Sys.Prompt[2]
