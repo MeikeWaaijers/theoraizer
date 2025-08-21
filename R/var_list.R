@@ -115,7 +115,11 @@ var_list <- function(topic,
 
 
   #validate input
-  stopifnot("'topic' should be a character string." = is.character(topic))
+  stopifnot(
+    "'topic' should be a single non-empty character string." =
+      is.null(topic) ||
+      (is.character(topic) && length(topic) == 1L && !is.na(topic) && nzchar(trimws(topic)))
+  )
   stopifnot("'include_topic' should be a logical value." = is.logical(include_topic))
   stopifnot("'n_final' should be a whole number above 0." =
               is.numeric(n_final) && n_final == floor(n_final) && n_final >= 0)

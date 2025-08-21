@@ -191,8 +191,11 @@ cld_plot <- function(topic,
                      not_plot = FALSE) {
 
   #validate input
-  stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
-
+  stopifnot(
+    "'topic' should be a single non-empty character string or NULL." =
+      is.null(topic) ||
+      (is.character(topic) && length(topic) == 1L && !is.na(topic) && nzchar(trimws(topic)))
+  )
   if (is.null(relation_df) && is.null(direction_df) && is.null(rel_sign_df) && is.null(dir_sign_df)) {
     test <- FALSE
   } else {

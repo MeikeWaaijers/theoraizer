@@ -35,7 +35,7 @@ test_that("Invalid topic parameter causes error", {
                                               n_variables = 10,
                                               LLM_model = "gpt-4",
                                               max_tokens = 1000),
-                         "'topic' should be a character string.")
+                         "'topic' should be a single non-empty character string.")
 })
 
 test_that("Invalid n_variables parameter causes error", {

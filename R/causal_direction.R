@@ -115,7 +115,11 @@ causal_direction <- function(topic,
                              update_key = FALSE) {
 
   #validate input
-  stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
+  stopifnot(
+    "'topic' should be a single non-empty character string or NULL." =
+      is.null(topic) ||
+      (is.character(topic) && length(topic) == 1L && !is.na(topic) && nzchar(trimws(topic)))
+  )
   stopifnot("'causal_threshold' should be a number between 0 and 100, and cannot have more than two decimal points." =
               is.numeric(causal_threshold) && causal_threshold >= 0 && causal_threshold <= 100 && round(causal_threshold, 2) == causal_threshold)
   stopifnot("'relation_df' should be a dataframe." = is.data.frame(relation_df))

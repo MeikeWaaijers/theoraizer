@@ -141,7 +141,11 @@ cld <- function(topic,
   is_shiny <- shiny::isRunning()
 
   # Validate input
-  stopifnot("'topic' should be a character string or NULL." = is.character(topic) | is.null(topic))
+  stopifnot(
+    "'topic' should be a single non-empty character string or NULL." =
+      is.null(topic) ||
+      (is.character(topic) && length(topic) == 1L && !is.na(topic) && nzchar(trimws(topic)))
+  )
   stopifnot("'variable_list' should be a vector containing more than one variables." = is.vector(variable_list) && length(variable_list) > 1)
   stopifnot("All entries in 'variable_list' should be character strings." = all(sapply(variable_list, is.character)))
   stopifnot("'plot' should be a logical value." = is.logical(plot))

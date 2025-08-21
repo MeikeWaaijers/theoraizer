@@ -41,7 +41,7 @@ test_that("Invalid topic parameter causes error", {
                                                       causal_threshold = 50,
                                                       LLM_model = "gpt-4",
                                                       max_tokens = 1000),
-                         "'topic' should be a character string or NULL.")
+                         "'topic' should be a single non-empty character string or NULL.")
 })
 
 test_that("Invalid relation_df parameter causes error", {
