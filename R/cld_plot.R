@@ -41,10 +41,11 @@
 #'          layout = "average",
 #'          legend = TRUE,
 #'          not_plot = FALSE)
-#' @details
-#' to create a fully fledged theory from scratch, the functions in this R-packaged should be used in the following order:
 #'
-#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}}
+#' @details
+#' To create a theory from scratch, the functions in this R-package should be used in the following order:
+#'
+#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{find_source}}
 #'
 #' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
 #' @param relation_df A dataframe with a unique pair of variables on each row and the probability of the existence of a causal relationship between these variables. (The \code{relation_df} output of the \code{\link{causal_relation}} function).
@@ -81,7 +82,7 @@
 #'     } \cr
 #'   \item When a sign probability dataframe is entered, the corresponding edge list will include a fourth column:
 #'     \itemize{
-#'       \item \code{sign}: The sign of the causal relationship (can be either "positive", "negative", or "uncertain").
+#'       \item \code{sign}: The sign of the causal relationship (can be either "Positive", "Negative", or "Uncertain").
 #'     }
 #'   \item If the \code{not_plot} argument is set to \code{TRUE} the edge list will have an additional column:
 #'     \itemize{
@@ -101,10 +102,10 @@
 #' \code{\link{causal_relation}},
 #' \code{\link{causal_direction}},
 #' \code{\link{causal_sign}},
+#' \code{\link{find_source}},
 #' \code{\link[qgraph]{qgraph}}
 #'
 #' @examples
-#'
 #' ## Example input (topic = addiction).
 #' # Relation probability dataframe input
 #' data("rel")
@@ -170,6 +171,7 @@
 #'                         relation_df = rel$relation_df,
 #'                         not_plot = TRUE)
 #' }
+#'
 #' @import qgraph
 #' @export
 

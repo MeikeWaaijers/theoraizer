@@ -15,6 +15,8 @@ test_that("causal_sign() works for a both input df", {
   testthat::expect_true(is.list(rel_sign))
   testthat::expect_true(sum(c("raw_LLM",
                               "sign_df") %in% names(rel_sign)) == 2)
+
+  # raw_LLM checks
   testthat::expect_true(is.data.frame(rel_sign$raw_LLM))
   testthat::expect_true(sum(c("relationship",
                               "iteration",
@@ -27,6 +29,8 @@ test_that("causal_sign() works for a both input df", {
                               "answer_tokens",
                               "total_tokens",
                               "error") %in% names(rel_sign$raw_LLM)) == 11)
+
+  #rel_sign and dir_sign checks
   testthat::expect_true(is.data.frame(rel_sign$sign_df))
   testthat::expect_true(sum(c("var1",
                               "var2",

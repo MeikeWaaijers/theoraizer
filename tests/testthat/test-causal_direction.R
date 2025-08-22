@@ -13,6 +13,8 @@ test_that("causal_direction() works", {
   testthat::expect_true(is.list(dir))
   testthat::expect_true(all(c("raw_LLM",
                               "direction_df") %in% names(dir)))
+
+  # raw_LLM checks
   testthat::expect_true(is.data.frame(dir$raw_LLM))
   testthat::expect_true(all(c("var",
                               "relationship",
@@ -26,6 +28,8 @@ test_that("causal_direction() works", {
                               "answer_tokens",
                               "total_tokens",
                               "error") %in% names(dir$raw_LLM)))
+
+  # dir checks
   testthat::expect_true(is.data.frame(dir$direction_df))
   testthat::expect_true(all(c("var1",
                               "var2",

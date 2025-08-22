@@ -19,7 +19,6 @@
 #### theoraizer
 ### edge_lists data set
 
-## Data description
 
 #' edge_lists data
 #'
@@ -49,7 +48,7 @@
 #'       \item \code{from}: The "from" node, otherwise known as the "cause" variable.
 #'       \item \code{to}: The "to" node, otherwise known as the "dependent" variable.
 #'       \item \code{weight}: The weights associated with the causal relationship. In this case, the weights refer to the probability of there being a causal relationship.
-#'       \item \code{sign}: The sign of the causal relationship (can be either "positive", "negative", or "uncertain").
+#'       \item \code{sign}: The sign of the causal relationship (can be either "Positive", "Negative", or "Uncertain").
 #'     }} \cr
 #'   \item \code{dir_sign_edge_list}: Edge list for a direction probability dataframe with sign indication (direction \code{sign_df}) input.
 #'     \describe{
@@ -57,7 +56,7 @@
 #'       \item \code{from}: The "from" node, otherwise known as the "cause" variable.
 #'       \item \code{to}: The "to" node, otherwise known as the "dependent" variable.
 #'       \item \code{weight}: The weights associated with the causal relationship. In this case, the weights refer to the probability of there being a causal relationship.
-#'       \item \code{sign}: The sign of the causal relationship (can be either "positive", "negative", or "uncertain").
+#'       \item \code{sign}: The sign of the causal relationship (can be either "Positive", "Negative", or "Uncertain").
 #'     }}
 #' }
 #' }

@@ -41,10 +41,11 @@
 #'          LLM_model = "gpt-4o",
 #'          max_tokens = 2000,
 #'          update_key = FALSE)
-#' @details
-#' To create a fully fledged theory from scratch, the functions in this R-packaged should be used in the following order:
 #'
-#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}}
+#' @details
+#' To create a theory from scratch, the functions in this R-package should be used in the following order:
+#'
+#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{find_source}}
 #'
 #' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
 #' @param include_topic If \code{include_topic = FALSE} (default), the topic specified in the \code{"topic"} argument will not be included as a seperate variable in the variable list.
@@ -86,6 +87,7 @@
 #' \code{\link{causal_direction}},
 #' \code{\link{causal_sign}},
 #' \code{\link{cld_plot}},
+#' \code{\link{find_source}}
 #'
 #' @examples
 #' \dontrun{
@@ -93,10 +95,11 @@
 #' vars <- var_list(topic = "addiction",
 #'                  n_final = 10,
 #'                  n_variables = "all")
-#' }
+#'
 #' # Check output
 #' vars$all_vars
 #' vars$final_list
+#' }
 #'
 #' @import httr
 #' @import utils

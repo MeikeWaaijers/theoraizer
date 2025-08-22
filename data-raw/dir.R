@@ -1,4 +1,4 @@
-dir <- causal_direction(context = "Addiction",
+dir <- causal_direction(topic = "Addiction",
                         relation_df = rel$relation_df,
                         causal_threshold = 50,
                         LLM_model = "gpt-4o",

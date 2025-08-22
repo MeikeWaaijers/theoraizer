@@ -185,7 +185,7 @@ LLM <- function(prompt = prompt,
     output <- content$choices[[1]]$message$content
 
   } else if (LLM_model == "gpt-4.1") {
-    logprob = FALSE
+    logprob <- FALSE
 
     api_key <- get_api_key("openai",
                            update_key = update_key)
@@ -194,52 +194,55 @@ LLM <- function(prompt = prompt,
     endpoint <- "https://api.openai.com/v1/responses"
 
     # Request body
-    request_body <- list(
-      model = LLM_model,
-      tools = list(list(type = "web_search_preview")),
-      max_output_tokens = max_tokens,
-      temperature = temperature,
-      # n = 1,
-      # suffix = suffix,
-      # top_p = top_p,
-      # stop = stop,
-      # presence_penalty = presence_penalty,
-      # frequency_penalty = frequency_penalty,
-      input = prompt
-    )
-
+    request_body <- list(model = LLM_model,
+                         tools = list(list(type = "web_search_preview")),
+                         max_output_tokens = max_tokens,
+                         temperature = temperature,
+                         input = prompt)
 
     # Make the API request
     request <- httr::RETRY(verb = "POST",
                            url = endpoint,
                            body = request_body,
-                           httr::add_headers(Authorization = paste("Bearer",
-                                                                   api_key)),
+                           httr::add_headers(Authorization = paste("Bearer", api_key)),
                            encode = "json",
                            times = 5,
                            httr::timeout(timeout_sec))
 
     # Extract the response
     raw_content <- content <- httr::content(request)
-    output <- content$output[[2]]$content[[1]]$text
 
-    n_sources <- length(raw_content$output[[2]]$content[[1]]$annotations)
+    # Safely extract text
+    output <- tryCatch(
+      raw_content$output[[2]]$content[[1]]$text,
+      error = function(e) ""
+    )
+
+    # Safely extract sources
+    n_sources <- tryCatch(
+      length(raw_content$output[[2]]$content[[1]]$annotations),
+      error = function(e) 0
+    )
 
     sources <- NULL
-    for (i in 1:n_sources) {
-      sources[i] <- content$output[[2]]$content[[1]]$annotations[[i]]$url
-
+    if (n_sources > 0) {
+      for (i in 1:n_sources) {
+        sources[i] <- tryCatch(
+          raw_content$output[[2]]$content[[1]]$annotations[[i]]$url,
+          error = function(e) NA
+        )
+      }
     }
 
   }
 
   if (LLM_model == "gpt-4.1") {
     output <- list(raw_content = list(LLM_model = raw_content$model,
-                                      content = raw_content$output[[2]]$content[[1]]$text,
-                                      finish_reason = raw_content$output[[2]]$status,
-                                      prompt_tokens = raw_content$usage$input_tokens,
-                                      answer_tokens = raw_content$usage$output_tokens,
-                                      total_tokens = raw_content$usage$total_tokens,
+                                      content = tryCatch(raw_content$output[[2]]$content[[1]]$text, error = function(e) ""),
+                                      finish_reason = tryCatch(raw_content$output[[2]]$status, error = function(e) NA),
+                                      prompt_tokens = tryCatch(raw_content$usage$input_tokens, error = function(e) NA),
+                                      answer_tokens = tryCatch(raw_content$usage$output_tokens, error = function(e) NA),
+                                      total_tokens = tryCatch(raw_content$usage$total_tokens, error = function(e) NA),
                                       error = raw_content$error),
                    sources = sources,
                    output = output)

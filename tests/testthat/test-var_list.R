@@ -14,6 +14,8 @@ test_that("var_list() works", {
   testthat::expect_true(all(c("raw_LLM",
                               "all_vars",
                               "final_list") %in% names(vars)))
+
+  # raw_LLM checks
   testthat::expect_true(is.data.frame(vars$raw_LLM))
   testthat::expect_true(all(c("function_part",
                               "iteration",
@@ -29,6 +31,7 @@ test_that("var_list() works", {
   testthat::expect_equal(length(vars$final_list), 2)
 })
 
+#vars_list check
 test_that("Invalid topic parameter causes error", {
   testthat::expect_error(theoraizer::var_list(topic = 123,
                                               n_final = 5,

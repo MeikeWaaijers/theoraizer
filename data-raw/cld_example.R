@@ -1,4 +1,4 @@
-cld_example <- cld(context = "Addiction",
+cld_example <- cld(topic = "Addiction",
                    variable_list = vars$final_list,
                    plot = TRUE,
                    LLM_model = "gpt-4o",

@@ -15,6 +15,8 @@ test_that("cld() works", {
   testthat::expect_true(is.list(output))
   testthat::expect_true(all(c("raw_LLM",
                               "sign_df") %in% names(output)))
+
+  # raw_LLM checks
   testthat::expect_true(is.data.frame(output$raw_LLM))
   testthat::expect_true(all(c("which_fun",
                               "var",
@@ -29,6 +31,8 @@ test_that("cld() works", {
                               "answer_tokens",
                               "total_tokens",
                               "error") %in% names(output$raw_LLM)))
+
+  # output checks
   testthat::expect_true(is.data.frame(output$sign_df))
   testthat::expect_true(all(c("var1",
                               "var2",

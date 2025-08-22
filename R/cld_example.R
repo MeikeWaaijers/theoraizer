@@ -65,7 +65,7 @@
 #'       \item \code{from}: Cause variable.
 #'       \item \code{to}: Dependent variable.
 #'       \item \code{weight}: Probability of a causal relationship between the Cause and Dependent variable.
-#'       \item \code{sign}: Sign of the causal relationship (either Positive, Negative or Uncertain).
+#'       \item \code{sign}: Sign of the causal relationship (can be either "Positive", "Negative", or "Uncertain").
 #'     }}
 #' }
 #' }

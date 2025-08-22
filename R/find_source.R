@@ -1,0 +1,378 @@
+# Program Name: theoraizer
+# Description: In the find_source function a Large Language Model (LLM) is asked to identify relevant scientific sources for each variable pair in a Causal Loop Diagram (CLD).
+# Copyright (C) <2024> <Meike Waaijers>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+#### theoraizer
+### Find source function
+
+## Function manual
+
+#' Find Scientific Sources for Causal Relationships
+#'
+#' @description
+#' \code{find_source()} iterates over an edge list of putative causal relationships and asks a Large Language Model (LLM) to find and summarize relevant sources for each relationship.
+#'
+#' @usage
+#' find_source(topic,
+#'             edge_list = NULL,
+#'             causal_threshold = 50,
+#'             scientific = TRUE,
+#'             LLM_model = "gpt-4.1",
+#'             max_tokens = 2000,
+#'             update_key = FALSE)
+#'
+#' @details
+#' To create a theory from scratch, the functions in this R-package should be used in the following order:
+#'
+#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{find_source}}
+#'
+#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
+#' @param edge_list A data frame representing a causal edge list, with one row per putative causal relationship. Must contain at least three columns: \code{from}, a character column naming the cause variable; \code{to}, a character column naming the dependent variable; and \code{weight}, a numeric column giving the probability of a causal relationship. Optionally, a fourth column \code{sign} can be included with values \code{"Positive"}, \code{"Negative"}, or \code{"Uncertain"} to indicate the sign of the relationship.
+#' @param causal_threshold A number (defaults to \code{50}) used to determine how to interpret the causal relationship. If an edge's weight is greater than this threshold, the model is asked to find a source that supports a causal relationship. If the weight is equal to or below the threshold, the model is asked to find a source indicating no causal relationship.
+#' @param scientific If \code{scientific = TRUE } (default), the LLM is asked to find a scientific publication as a source. If \code{FALSE}, any credible source is allowed.
+#' @inheritParams var_list
+#'
+#' @inheritParams var_list
+#'
+#' @returns
+#' \itemize{
+#'   \item \code{raw_LLM}: A dataframe containing the unprocessed LLM output along with some other LLM information, including:
+#'     \itemize{
+#'       \item \code{relationship}: Which variable pair.
+#'       \item \code{LLM_model}: LLM model used.
+#'       \item \code{prompt}: The prompt asked to the LLM.
+#'       \item \code{content}: Unprocessed LLM output.
+#'       \item \code{finish_reason}: Reason the LLM stopped generating output.
+#'       \item \code{prompt_tokens}: Number of tokens used for the LLM prompt.
+#'       \item \code{answer_tokens}: Number of tokens used for the LLM answer.
+#'       \item \code{total_tokens}: Total number of tokens used.
+#'       \item \code{error}: Error message, if any occurred.
+#'     }
+#' } \cr
+#' \itemize{
+#'   \item \code{edge_list_with_sources}: The input \code{edge_list} with all its original columns retained, plus two new ones:
+#'     \itemize{
+#'     \item \code{from}: The cause variable.
+#'     \item \code{to}: The dependent variable.
+#'     \item \code{weight}: The weight associated with the causal relationship.
+#'     \item \code{sign}: (Optional) The sign of the causal relationship (can be either "Positive", "Negative", or "Uncertain").
+#'     \item \code{explanation}: A short summary of the sources identified by the model, typically including the key findings and how they relate to the causal relationship. May also note when no direct publication was found.
+#'     \item \code{sources}: One or more citation links returned by the model, stored as a semicolon separated string.
+#'     }
+#' }
+#'
+#' @references \url{https://platform.openai.com}
+#'
+#' @author Meike Waaijers
+#'
+#' @note The function and its output should be approached with caution. Depending on the specific LLM used, there may be financial implications. Furthermore, we wish to emphasise that the answers generated by an LLM should not be taken as absolute truth.
+#'
+#' @seealso
+#' \code{\link{cld}},
+#' \code{\link{var_list}},
+#' \code{\link{causal_relation}},
+#' \code{\link{causal_direction}},
+#' \code{\link{causal_sign}},
+#' \code{\link{cld_plot}}
+#'
+#' @examples
+#' \dontrun{
+#' ## Example input (topic = "addiction")
+#' data("edge_lists")
+#'
+#' # Use the direction + sign edge list (columns: from, to, weight, sign)
+#' input <- edge_lists$dir_sign_edge_list[, 1:4]
+#'
+#' #---------------------------------------------------------------------------
+#' ## Default
+#' # For a readily available, pre-made output example see: data("sources")
+#' sources <- find_source(topic = "addiction",
+#'                        edge_list = input)
+#'
+#' # Check output
+#' sources$edge_list_with_sources
+#' }
+#'
+#' @import httr
+#' @import utils
+#' @import keyring
+#' @export
+
+
+## find_source function
+find_source <- function(topic,
+                        edge_list = NULL,
+                        causal_threshold = 50,
+                        scientific = TRUE,
+                        LLM_model = "gpt-4.1",
+                        max_tokens = 2000,
+                        update_key = FALSE) {
+
+  # Validate input
+  stopifnot(
+    "'topic' should be a single non-empty character string or NULL." =
+      is.null(topic) ||
+      (is.character(topic) && length(topic) == 1L && !is.na(topic) && nzchar(trimws(topic)))
+  )
+  stopifnot("'edge_list' should be a data frame." = is.data.frame(edge_list))
+  stopifnot("'edge_list' should have at least three columns named 'from', 'to', and 'weight'." =
+              ncol(edge_list) >= 3 && all(c("from", "to", "weight") %in% names(edge_list)))
+  stopifnot("All entries in 'edge_list$from' and 'edge_list$to' should be character strings." =
+              all(sapply(edge_list$from, is.character)) && all(sapply(edge_list$to, is.character)))
+  stopifnot("All entries in 'edge_list$weight' should be numeric." =
+              all(sapply(edge_list$weight, is.numeric)))
+
+  if (ncol(edge_list) > 3) {
+    stopifnot("'edge_list' should have at a maximum of four columns named 'from', 'to', 'weight', and 'sign'." =
+                ncol(edge_list) == 4 && all(c("from", "to", "weight", "sign") %in% names(edge_list)))
+    stopifnot("All entries in 'edge_list$sign' should be either 'Positive', 'Negative', or 'Uncertain'." =
+                all(edge_list$sign %in% c("Positive", "Negative", "Uncertain")))
+  }
+
+  stopifnot("'LLM_model' should be 'gpt-4.1'" = LLM_model == "gpt-4.1")
+  stopifnot("For 'gpt-4.1', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
+              is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens > 0 && max_tokens <= 6000)
+
+
+  ## Load and prepare prompt data
+  prompt_file_path <- system.file("extdata", "prompts.csv", package = "theoraizer")
+  prompts_data <- utils::read.csv(prompt_file_path, sep = ";")
+
+  # replace '\\n' with '\n' in all text columns
+  for (i in 1:length(prompts_data$Prompt)) {
+    # Check if the prompt column is a character type
+    if (is.character(prompts_data$Prompt[[i]])) {
+      # Replace '\\n' with '\n' in the column
+      prompts_data$Prompt[[i]] <- gsub("\\n", "\n", prompts_data$Prompt[[i]], fixed = TRUE)
+    }
+
+    # Check if the sys prompt column is a character type
+    if (is.character(prompts_data$Sys.Prompt[[i]])) {
+      # Replace '\\n' with '\n' in the column
+      prompts_data$Sys.Prompt[[i]] <- gsub("\\n", "\n", prompts_data$Sys.Prompt[[i]], fixed = TRUE)
+    }
+  }
+
+  source_prompts <- prompts_data[prompts_data$Function == "source", ]
+
+  # Initialize storage
+  runs <- vector("list", nrow(edge_list))
+  raw_LLM <- vector("list", nrow(edge_list))
+  all_sources <- vector("list", nrow(edge_list))
+  explanation <- vector("list", nrow(edge_list))
+
+  # Which source
+  if (scientific) {
+    source_type <- "a scientific publication"
+  } else {
+    source_type <- "a source"
+  }
+
+  ## Loop over all edges
+  for (j in 1:nrow(edge_list)) {
+
+    message(sprintf("Processing edge: %d/%d", j, nrow(edge_list)))
+
+    var_1 <- edge_list[j, "from"]
+    var_2 <- edge_list[j, "to"]
+    weight <- edge_list[j, "weight"]
+    is_above <- weight > causal_threshold
+
+    # Prompt logic
+    if (is_above) {
+      if ("sign" %in% names(edge_list)) {
+        sign <- tolower(edge_list[j, "sign"])
+        if (sign == "positive") {
+          if (is.null(topic)) {
+            prompt <- gsub("\\((source_type)\\)", source_type,
+                           gsub("\\((var_1)\\)", var_1,
+                                gsub("\\((var_2)\\)", var_2,
+                                     source_prompts$Prompt[1])))
+          } else if (!is.null(topic) && nzchar(trimws(topic))) {
+            prompt <- gsub("\\((topic)\\)", topic,
+                           gsub("\\((source_type)\\)", source_type,
+                                gsub("\\((var_1)\\)", var_1,
+                                     gsub("\\((var_2)\\)", var_2,
+                                          source_prompts$Prompt[6]))))
+          }
+
+        } else if (sign == "negative") {
+          if (is.null(topic)) {
+            prompt <- gsub("\\((source_type)\\)", source_type,
+                           gsub("\\((var_1)\\)", var_1,
+                                gsub("\\((var_2)\\)", var_2,
+                                     source_prompts$Prompt[2])))
+          } else if (!is.null(topic) && nzchar(trimws(topic))) {
+            prompt <- gsub("\\((topic)\\)", topic,
+                           gsub("\\((source_type)\\)", source_type,
+                                gsub("\\((var_1)\\)", var_1,
+                                     gsub("\\((var_2)\\)", var_2,
+                                          source_prompts$Prompt[7]))))
+          }
+
+        } else if (sign == "uncertain") {
+          if (is.null(topic)) {
+            prompt <- gsub("\\((source_type)\\)", source_type,
+                           gsub("\\((var_1)\\)", var_1,
+                                gsub("\\((var_2)\\)", var_2,
+                                     source_prompts$Prompt[3])))
+          } else if (!is.null(topic) && nzchar(trimws(topic))) {
+            prompt <- gsub("\\((topic)\\)", topic,
+                           gsub("\\((source_type)\\)", source_type,
+                                gsub("\\((var_1)\\)", var_1,
+                                     gsub("\\((var_2)\\)", var_2,
+                                          source_prompts$Prompt[8]))))
+          }
+        }
+
+      } else {
+        if (is.null(topic)) {
+          prompt <- gsub("\\((source_type)\\)", source_type,
+                         gsub("\\((var_1)\\)", var_1,
+                              gsub("\\((var_2)\\)", var_2,
+                                   source_prompts$Prompt[4])))
+        } else if (!is.null(topic) && nzchar(trimws(topic))) {
+          prompt <- gsub("\\((topic)\\)", topic,
+                         gsub("\\((source_type)\\)", source_type,
+                              gsub("\\((var_1)\\)", var_1,
+                                   gsub("\\((var_2)\\)", var_2,
+                                        source_prompts$Prompt[9]))))
+        }
+      }
+
+    } else {
+      if (is.null(topic)) {
+        prompt <- gsub("\\((source_type)\\)", source_type,
+                       gsub("\\((var_1)\\)", var_1,
+                            gsub("\\((var_2)\\)", var_2,
+                                 source_prompts$Prompt[5])))
+      } else if (!is.null(topic) && nzchar(trimws(topic))) {
+        prompt <- gsub("\\((topic)\\)", topic,
+                       gsub("\\((source_type)\\)", source_type,
+                            gsub("\\((var_1)\\)", var_1,
+                                 gsub("\\((var_2)\\)", var_2,
+                                      source_prompts$Prompt[10]))))
+      }
+    }
+
+
+    tryCatch({
+      result <- LLM(prompt = prompt,
+                    LLM_model = LLM_model,
+                    max_tokens = max_tokens,
+                    temperature = 0,
+                    logprobs = FALSE,
+                    raw_output = TRUE,
+                    update_key = update_key)
+
+      update_key <- FALSE # make sure api key is only updated once
+
+      runs[[j]] <- result$output
+      all_sources[[j]] <- result$sources
+      raw_LLM[[j]] <- c(prompt = prompt, result$raw_content)
+
+    }, error = function(e) {
+      message(sprintf("Error at edge %d (%s -> %s): %s", j, var_1, var_2, e$message))
+      runs[[j]] <- NA
+      all_sources[j] <- list(NULL)
+      raw_LLM[[j]] <- list(prompt = prompt, error = e$message)
+    })
+  }
+
+
+  ## Clean LLM output
+  for (k in seq_along(runs)) {
+    tryCatch({
+      if (is.null(runs[[k]]) || is.na(runs[[k]])) stop("Empty or missing run")
+      text <- runs[[k]]
+      text <- gsub('\\\\\"', '"', text)
+      text <- gsub('\\\\n', '\n', text)
+      text <- gsub('\\(\\[[^\\]]+\\]\\((.*?)\\)\\)', '(\\1)', text, perl = TRUE)
+      text <- gsub('\\[[^\\]]+\\]\\((.*?)\\)', '(\\1)', text, perl = TRUE)
+      text <- gsub('[[:space:]]+', ' ', text)
+      text <- trimws(text)
+      text <- gsub('"', "'", text)
+      explanation[[k]] <- text
+    }, error = function(e) {
+      message(sprintf("Cleaning error at index %d: %s", k, e$message))
+      explanation[[k]] <- NA
+    })
+  }
+
+  ## Combine results
+  edge_list_out <- edge_list
+  edge_list_out$explanation <- explanation
+  edge_list_out$sources <- vapply(seq_len(nrow(edge_list_out)),
+                                  function(i) {
+                                    x <- all_sources[[i]]
+                                    if (is.null(x) || length(x) == 0) NA_character_ else paste(x, collapse = "; ")
+                                  },
+                                  FUN.VALUE = character(1))
+
+  # Add raw_LLM to output
+  tryCatch({
+    # Initialize empty dataframe
+    flattened_df_raw_LLM <- data.frame(relationship = integer(),
+                                       LLM_model = character(),
+                                       prompt = character(),
+                                       content = character(),
+                                       finish_reason = character(),
+                                       prompt_tokens = numeric(),
+                                       answer_tokens = numeric(),
+                                       total_tokens = numeric(),
+                                       error = character(),
+                                       stringsAsFactors = FALSE)
+
+    for (i in seq_along(raw_LLM)) {
+
+      temp <- raw_LLM[[i]]
+
+      flattened_df_raw_LLM <- rbind(flattened_df_raw_LLM,
+                                    data.frame(relationship = i,
+                                               LLM_model = temp$LLM_model,
+                                               prompt = temp$prompt,
+                                               content = temp$content,
+                                               finish_reason = temp$finish_reason,
+                                               prompt_tokens = temp$prompt_tokens,
+                                               answer_tokens = temp$answer_tokens,
+                                               total_tokens = temp$total_tokens,
+                                               error = ifelse(is.null(temp$error), NA, temp$error),
+                                               stringsAsFactors = FALSE))
+    }
+
+  }, error = function(e) {
+    cat(paste0("Warning: Unable to return raw LLM output -> ", e$message, "."),
+        "Only part of the output is returned.", sep = "\n")
+  })
+
+  # Final check
+  if (all(is.na(edge_list_out$explanation))) {
+    for (i in seq_along(raw_LLM)) {
+      err <- try(raw_LLM[[i]]$error$message, silent = TRUE)
+      if (!inherits(err, "try-error") && !is.null(err)) stop(err)
+    }
+    stop("LLM failed to produce any usable output, and no error message was found.")
+  }
+
+  message(sprintf("Total of LLM prompts: %d", length(runs)))
+
+  output <- list(raw_LLM = flattened_df_raw_LLM,
+                 edge_list_with_sources = edge_list_out)
+
+
+  return(output)
+}

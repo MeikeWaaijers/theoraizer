@@ -13,6 +13,8 @@ test_that("causal_relation() works", {
   testthat::expect_true(is.list(rel))
   testthat::expect_true(all(c("raw_LLM",
                               "relation_df") %in% names(rel)))
+
+  # raw_LLM checks
   testthat::expect_true(is.data.frame(rel$raw_LLM))
   testthat::expect_true(all(c("relationship",
                               "iteration",
@@ -25,6 +27,8 @@ test_that("causal_relation() works", {
                               "answer_tokens",
                               "total_tokens",
                               "error") %in% names(rel$raw_LLM)))
+
+  # rel checks
   testthat::expect_true(is.data.frame(rel$relation_df))
   testthat::expect_true(all(c("var1",
                               "var2",

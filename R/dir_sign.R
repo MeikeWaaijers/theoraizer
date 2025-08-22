@@ -44,7 +44,7 @@
 #'         \item \code{answer_tokens}: Number of tokens used for the LLM answer.
 #'         \item \code{total_tokens}: Total number of tokens used.
 #'         \item \code{error}: Error message, if any occurred.
-#'     }} \cr
+#'      }} \cr
 #'     \item \code{sign_df}: A dataframe with nine columns representing the probability of the presence, the direction, and the sign of causal relationships between various variable.
 #'       \describe{
 #'       \itemize{

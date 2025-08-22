@@ -1,4 +1,4 @@
-edge_lists <- cld_plot(context = "Addiction",
+edge_lists <- cld_plot(topic = "Addiction",
                        relation_df = rel$relation_df,
                        direction_df = dir$direction_df,
                        rel_sign_df = rel_sign$sign_df,

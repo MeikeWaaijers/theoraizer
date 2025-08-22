@@ -1,4 +1,4 @@
-dir_sign <- causal_sign(context = "Addiction",
+dir_sign <- causal_sign(topic = "Addiction",
                         prob_df = dir$direction_df,
                         causal_threshold = 50,
                         LLM_model = "gpt-4o",
