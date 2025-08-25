@@ -44,6 +44,8 @@
 #' @param edge_list A data frame representing a causal edge list, with one row per putative causal relationship. Must contain at least three columns: \code{from}, a character column naming the cause variable; \code{to}, a character column naming the dependent variable; and \code{weight}, a numeric column giving the probability of a causal relationship. Optionally, a fourth column \code{sign} can be included with values \code{"Positive"}, \code{"Negative"}, or \code{"Uncertain"} to indicate the sign of the relationship.
 #' @param causal_threshold A number (defaults to \code{50}) used to determine how to interpret the causal relationship. If an edge's weight is greater than this threshold, the model is asked to find a source that supports a causal relationship. If the weight is equal to or below the threshold, the model is asked to find a source indicating no causal relationship.
 #' @param scientific If \code{scientific = TRUE } (default), the LLM is asked to find a scientific publication as a source. If \code{FALSE}, any credible source is allowed.
+#' @param LLM_model The LLM model that should be used to generate output. As of now, only \code{"gpt-4.1"} is available for this function. Other models may be added in future updates.
+#' @param max_tokens The maximum number of tokens the LLM should generate. Be careful when adjusting this argument. Reducing the maximum token limit will reduce the cost but may result in incomplete answers. Conversely, increasing the token limit can be advantageous for obtaining more detailed responses. The maximum number of tokens depends on the model. As of now, only \code{"gpt-4.1"} is supported for this function, with a maximum token limit of \code{6000}.
 #' @inheritParams var_list
 #'
 #' @inheritParams var_list
