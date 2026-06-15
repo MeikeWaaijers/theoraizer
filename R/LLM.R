@@ -282,3 +282,22 @@ LLM <- function(prompt = prompt,
 
   return(output)
 }
+
+
+
+## LLM dispatcher: routes to custom function or built-in LLM()
+.call_llm <- function(prompt, system_prompt, LLM_model, max_tokens,
+                      update_key, custom_llm_fn) {
+  if (!is.null(custom_llm_fn)) {
+    res <- custom_llm_fn(prompt = prompt, system_prompt = system_prompt)
+    if (is.null(res$raw_content))
+      res$raw_content <- list(LLM_model = "custom", content = res$output,
+                              finish_reason = NA, prompt_tokens = NA,
+                              answer_tokens = NA, total_tokens = NA, error = NULL)
+    if (is.null(res$top5_tokens)) res$top5_tokens <- NULL
+    return(res)
+  }
+  LLM(prompt = prompt, LLM_model = LLM_model, max_tokens = max_tokens,
+      temperature = 0, logprobs = TRUE, raw_output = TRUE,
+      system_prompt = system_prompt, update_key = update_key)
+}

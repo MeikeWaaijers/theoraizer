@@ -32,7 +32,8 @@
 #'             causal_threshold = 50,
 #'             LLM_model = "gpt-4o",
 #'             max_tokens = 2000,
-#'             update_key = FALSE)
+#'             update_key = FALSE,
+#'             custom_llm_fn = NULL)
 #'
 #' @details
 #' To create a theory from scratch, the functions in this R-package should be used in the following order:
@@ -171,7 +172,8 @@ causal_sign <- function(topic,
                         causal_threshold = 50,
                         LLM_model = "gpt-4o",
                         max_tokens = 2000,
-                        update_key = FALSE) {
+                        update_key = FALSE,
+                        custom_llm_fn = NULL) {
 
   #validate input
   stopifnot(
@@ -213,20 +215,29 @@ causal_sign <- function(topic,
               all(sapply(prob_df$prob_causal, function(x) is.numeric(x) && x >= 0 && x <= 100)))
   stopifnot("At least one variable pair should be classified as 'causal'." = sum(prob_df$prob_causal) > 0)
   stopifnot("'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'mixtral', or 'llama-3'." =
-              LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo", "llama-3"))
+              !is.null(custom_llm_fn) || LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo", "llama-3"))
   stopifnot("For 'gpt-4o', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "gpt-4o") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+              !is.null(custom_llm_fn) || !(LLM_model == "gpt-4o") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("For 'gpt-4', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "gpt-4") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+              !is.null(custom_llm_fn) || !(LLM_model == "gpt-4") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("For 'gpt-4-turbo', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "gpt-4-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+              !is.null(custom_llm_fn) || !(LLM_model == "gpt-4-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("For 'gpt-3.5-turbo', 'max_tokens' should be a whole number above 0, and not higher than 3000." =
-              !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
+              !is.null(custom_llm_fn) || !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
   stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." =
-              !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
+              !is.null(custom_llm_fn) || !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
   stopifnot("For 'llama-3', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "llama-3") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+              !is.null(custom_llm_fn) || !(LLM_model == "llama-3") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("'update_key' should be a logical value." = is.logical(update_key))
+
+  if (!is.null(custom_llm_fn)) {
+    stopifnot("'custom_llm_fn' must be a function accepting 'prompt' and 'system_prompt'." =
+                is.function(custom_llm_fn) &&
+                all(c("prompt", "system_prompt") %in% names(formals(custom_llm_fn))))
+    if (update_key) message("'update_key' is ignored when 'custom_llm_fn' is provided.")
+    message("'LLM_model' and 'max_tokens' are ignored when 'custom_llm_fn' is provided.")
+    message("Note: this function requires '$top5_tokens' in the custom function output to calculate probabilities. Without it, only raw LLM output will be returned.")
+  }
 
   ## Load and prepare prompt data
   prompt_file_path <- system.file("extdata", "prompts.csv", package = "theoraizer")
@@ -376,14 +387,12 @@ causal_sign <- function(topic,
         system_prompt <- system_prompt_database[[c]]
 
         # LLM
-        pos_neg <- LLM(prompt = prompt,
-                       LLM_model = LLM_model,
-                       max_tokens = ifelse(LLM_model == "mixtral", 4, max_tokens),
-                       temperature = 0,
-                       logprobs = TRUE,
-                       raw_output = TRUE,
-                       system_prompt = system_prompt,
-                       update_key = update_key)
+        pos_neg <- .call_llm(prompt = prompt,
+                             system_prompt = system_prompt,
+                             LLM_model = LLM_model,
+                             max_tokens = ifelse(LLM_model == "mixtral", 4, max_tokens),
+                             update_key = update_key,
+                             custom_llm_fn = custom_llm_fn)
 
         update_key <- FALSE # make sure api key is only updated once
         raw_posneg[c] <- list(c(prompt = prompt, system_prompt = system_prompt, pos_neg$raw_content))
@@ -610,14 +619,12 @@ causal_sign <- function(topic,
 
 
         # LLM
-        var1_pos_neg <- LLM(prompt = var1_prompt,
-                            LLM_model = LLM_model,
-                            max_tokens = ifelse(LLM_model == "mixtral", 4, max_tokens),
-                            temperature = 0,
-                            logprobs = TRUE,
-                            raw_output = TRUE,
-                            system_prompt = var1_system_prompt,
-                            update_key = update_key)
+        var1_pos_neg <- .call_llm(prompt = var1_prompt,
+                                  system_prompt = var1_system_prompt,
+                                  LLM_model = LLM_model,
+                                  max_tokens = ifelse(LLM_model == "mixtral", 4, max_tokens),
+                                  update_key = update_key,
+                                  custom_llm_fn = custom_llm_fn)
 
         update_key <- FALSE # make sure api key is only updated once
         raw_posneg_var1[g] <- list(c(prompt = var1_prompt, system_prompt = var1_system_prompt, var1_pos_neg$raw_content))
@@ -715,14 +722,12 @@ causal_sign <- function(topic,
 
 
         # LLM
-        var2_pos_neg <- LLM(prompt = var2_prompt,
-                            LLM_model = LLM_model,
-                            max_tokens = ifelse(LLM_model == "mixtral", 4, max_tokens),
-                            temperature = 0,
-                            logprobs = TRUE,
-                            raw_output = TRUE,
-                            system_prompt = var2_system_prompt,
-                            update_key = update_key)
+        var2_pos_neg <- .call_llm(prompt = var2_prompt,
+                                  system_prompt = var2_system_prompt,
+                                  LLM_model = LLM_model,
+                                  max_tokens = ifelse(LLM_model == "mixtral", 4, max_tokens),
+                                  update_key = update_key,
+                                  custom_llm_fn = custom_llm_fn)
 
         update_key <- FALSE # make sure api key is only updated once
         raw_posneg_var2[k] <- list(c(prompt = var2_prompt, system_prompt = var2_system_prompt, var2_pos_neg$raw_content))

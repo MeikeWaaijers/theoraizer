@@ -5,3 +5,5 @@
 ^LICENSE\.md$
 ^data-raw$
 ^\.github$
+^\.positai$
+^\.claude$

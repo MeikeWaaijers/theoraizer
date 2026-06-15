@@ -8,7 +8,8 @@ causal_relation(topic,
                 variable_list,
                 LLM_model = "gpt-4o",
                 max_tokens = 2000,
-                update_key = FALSE)
+                update_key = FALSE,
+                custom_llm_fn = NULL)
 }
 \arguments{
 \item{topic}{A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.}
@@ -20,6 +21,8 @@ causal_relation(topic,
 \item{max_tokens}{The maximum number of tokens the LLM should generate. Be careful when adjusting this argument. Reducing the maximum token limit will reduce the cost but may result in incomplete answers. Conversely, increasing the token limit can be advantageous for obtaining more detailed responses. The maximum number of tokens depends on the model (\code{6000} for \code{"gpt-4o"}, \code{"gpt-4"}, and \code{"gpt-4-turbo"}, \code{3000} for \code{"gpt-3.5-turbo"}, and \code{2000} for \code{"mixtral"}).}
 
 \item{update_key}{If \code{update_key = TRUE}, the function will prompt the user for a new API key and update the saved key. If \code{update_key = FALSE} (default), the function will use the existing API key if available.}
+
+\item{custom_llm_fn}{Optionally, a custom function to use instead of the built-in LLM models. If provided, the \code{LLM_model}, \code{max_tokens}, and \code{update_key} arguments are ignored; handle those inside your custom function. The function must accept \code{prompt} and \code{system_prompt} as arguments and return a list with at minimum \code{$output} (the response text as a character string), and optionally \code{$top5_tokens} for functions that calculate probabilities from logprobs (namely the \code{\link{causal_relation}}, \code{\link{causal_direction}}, and \code{\link{causal_sign}} functions). \code{$top5_tokens} must be a list of dataframes, one per output token, each with columns \code{top5_tokens} (character), \code{logprob} (numeric), and \code{probability} (numeric).}
 }
 \value{
 \itemize{

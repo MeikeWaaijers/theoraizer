@@ -40,7 +40,8 @@
 #'          n_variables = "all",
 #'          LLM_model = "gpt-4o",
 #'          max_tokens = 2000,
-#'          update_key = FALSE)
+#'          update_key = FALSE,
+#'          custom_llm_fn = NULL)
 #'
 #' @details
 #' To create a theory from scratch, the functions in this R-package should be used in the following order:
@@ -54,6 +55,7 @@
 #' @param LLM_model The LLM model that should be used to generate output: \code{"gpt-4o"} (default), \code{"gpt-4"}, \code{"gpt-4-turbo"} \code{"gpt-3.5-turbo"}, \code{"llama-3"} (specifically points to Llama-3-70B-Chat-hf, accessed via Hugging Face), or \code{"mixtral"} (specifically points to Mixtral-8x7B-Instruct-v0.1, accessed via Together.ai).
 #' @param max_tokens The maximum number of tokens the LLM should generate. Be careful when adjusting this argument. Reducing the maximum token limit will reduce the cost but may result in incomplete answers. Conversely, increasing the token limit can be advantageous for obtaining more detailed responses. The maximum number of tokens depends on the model (\code{6000} for \code{"gpt-4o"}, \code{"gpt-4"}, and \code{"gpt-4-turbo"}, \code{3000} for \code{"gpt-3.5-turbo"}, and \code{2000} for \code{"mixtral"}).
 #' @param update_key If \code{update_key = TRUE}, the function will prompt the user for a new API key and update the saved key. If \code{update_key = FALSE} (default), the function will use the existing API key if available.
+#' @param custom_llm_fn Optionally, a custom function to use instead of the built-in LLM models. If provided, the \code{LLM_model}, \code{max_tokens}, and \code{update_key} arguments are ignored; handle those inside your custom function. The function must accept \code{prompt} and \code{system_prompt} as arguments and return a list with at minimum \code{$output} (the response text as a character string), and optionally \code{$top5_tokens} for functions that calculate probabilities from logprobs (namely the \code{\link{causal_relation}}, \code{\link{causal_direction}}, and \code{\link{causal_sign}} functions). \code{$top5_tokens} must be a list of dataframes, one per output token, each with columns \code{top5_tokens} (character), \code{logprob} (numeric), and \code{probability} (numeric).
 #'
 #' @returns
 #' \itemize{
@@ -114,7 +116,8 @@ var_list <- function(topic,
                      n_variables = "all",
                      LLM_model = "gpt-4o",
                      max_tokens = 2000,
-                     update_key = FALSE) {
+                     update_key = FALSE,
+                     custom_llm_fn = NULL) {
 
 
   #validate input
@@ -129,20 +132,28 @@ var_list <- function(topic,
   stopifnot("'n_variables' should be a whole number above 0 or the input should be 'all'." =
               ((is.numeric(n_variables) && n_variables == floor(n_variables) && n_variables >= 0) || n_variables == "all"))
   stopifnot("'LLM_model' should be 'gpt-4o', 'gpt-4', 'gpt-4-turbo', 'gpt-3.5-turbo', 'mixtral', or 'llama-3'." =
-              LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo", "llama-3"))
+              !is.null(custom_llm_fn) || LLM_model %in% c("mixtral", "gpt-4o", "gpt-4", "gpt-4-turbo", "gpt-3.5-turbo", "llama-3"))
   stopifnot("For 'gpt-4o', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "gpt-4o") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+              !is.null(custom_llm_fn) || !(LLM_model == "gpt-4o") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("For 'gpt-4', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "gpt-4") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+              !is.null(custom_llm_fn) || !(LLM_model == "gpt-4") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("For 'gpt-4-turbo', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "gpt-4-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+              !is.null(custom_llm_fn) || !(LLM_model == "gpt-4-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("For 'gpt-3.5-turbo', 'max_tokens' should be a whole number above 0, and not higher than 3000." =
-              !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
+              !is.null(custom_llm_fn) || !(LLM_model == "gpt-3.5-turbo") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 3000))
   stopifnot("For 'mixtral', 'max_tokens' should be a whole number above 0, and not higher than 2000." =
-              !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
+              !is.null(custom_llm_fn) || !(LLM_model == "mixtral") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 2000))
   stopifnot("For 'llama-3', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              !(LLM_model == "llama-3") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
+              !is.null(custom_llm_fn) || !(LLM_model == "llama-3") || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens >= 0 && max_tokens <= 6000))
   stopifnot("'update_key' should be a logical value." = is.logical(update_key))
+
+  if (!is.null(custom_llm_fn)) {
+    stopifnot("'custom_llm_fn' must be a function accepting 'prompt' and 'system_prompt'." =
+                is.function(custom_llm_fn) &&
+                all(c("prompt", "system_prompt") %in% names(formals(custom_llm_fn))))
+    if (update_key) message("'update_key' is ignored when 'custom_llm_fn' is provided.")
+    message("'LLM_model' and 'max_tokens' are ignored when 'custom_llm_fn' is provided.")
+  }
 
   ## Load and prepare prompt data
   prompt_file_path <- system.file("extdata", "prompts.csv", package = "theoraizer")
@@ -215,14 +226,12 @@ var_list <- function(topic,
     system_prompt <- sys_prompt_database[i]
 
     # LLM
-    variable_list <- LLM(prompt = prompt,
-                         LLM_model = LLM_model,
-                         max_tokens = max_tokens,
-                         temperature = 0,
-                         logprobs = TRUE,
-                         raw_output = TRUE,
-                         system_prompt = system_prompt,
-                         update_key = update_key)
+    variable_list <- .call_llm(prompt = prompt,
+                               system_prompt = system_prompt,
+                               LLM_model = LLM_model,
+                               max_tokens = max_tokens,
+                               update_key = update_key,
+                               custom_llm_fn = custom_llm_fn)
 
     update_key <- FALSE # make sure api key is only updated once
     runs[[i]] <- variable_list$output
@@ -287,14 +296,12 @@ var_list <- function(topic,
     system_prompt <- var_prompts$Sys.Prompt[3]
 
     # LLM
-    integrated <- LLM(prompt = prompt_int,
-                      LLM_model = LLM_model,
-                      max_tokens = max_tokens,
-                      temperature = 0,
-                      logprobs = TRUE,
-                      raw_output = TRUE,
-                      system_prompt = system_prompt,
-                      update_key = update_key)
+    integrated <- .call_llm(prompt = prompt_int,
+                            system_prompt = system_prompt,
+                            LLM_model = LLM_model,
+                            max_tokens = max_tokens,
+                            update_key = update_key,
+                            custom_llm_fn = custom_llm_fn)
 
     variables_ <- gsub("\n\n", "", integrated$output)  # remove "\n\n"  from LLM output
     raw2_LLM <- c(prompt = prompt_int, system_prompt = system_prompt, integrated$raw_content)
@@ -318,14 +325,12 @@ var_list <- function(topic,
     system_prompt <- var_prompts$Sys.Prompt[4]
 
     # LLM
-    add_vars <- LLM(prompt = prompt_add,
-                    LLM_model = LLM_model,
-                    max_tokens = max_tokens,
-                    temperature = 0,
-                    logprobs = TRUE,
-                    raw_output = TRUE,
-                    system_prompt = system_prompt,
-                    update_key = update_key)
+    add_vars <- .call_llm(prompt = prompt_add,
+                          system_prompt = system_prompt,
+                          LLM_model = LLM_model,
+                          max_tokens = max_tokens,
+                          update_key = update_key,
+                          custom_llm_fn = custom_llm_fn)
 
     extra_vars <- gsub("\n\n", "", add_vars$output)  # remove "\n\n"  from LLM output
     raw3_LLM <- c(prompt = prompt_add, system_prompt = system_prompt, add_vars$raw_content)
@@ -354,14 +359,12 @@ var_list <- function(topic,
                           var_prompts$Sys.Prompt[5])
 
     # LLM
-    clean <- LLM(prompt = prompt_clean,
-                 LLM_model = LLM_model,
-                 max_tokens = max_tokens,
-                 temperature = 0,
-                 logprobs = TRUE,
-                 raw_output = TRUE,
-                 system_prompt = system_prompt,
-                 update_key = update_key)
+    clean <- .call_llm(prompt = prompt_clean,
+                       system_prompt = system_prompt,
+                       LLM_model = LLM_model,
+                       max_tokens = max_tokens,
+                       update_key = update_key,
+                       custom_llm_fn = custom_llm_fn)
 
     cleaned_vars <- gsub("\n\n", "", clean$output)  # remove "\n\n"  from LLM output
     raw4_LLM <- c(prompt = prompt_clean, system_prompt = system_prompt, clean$raw_content)
@@ -405,14 +408,12 @@ var_list <- function(topic,
         system_prompt <- var_prompts$Sys.Prompt[6]
 
         # LLM
-        limit_integrated <- LLM(prompt = prompt_limit_int,
-                                LLM_model = LLM_model,
-                                max_tokens = max_tokens,
-                                temperature = 0,
-                                logprobs = TRUE,
-                                raw_output = TRUE,
-                                system_prompt = system_prompt,
-                                update_key = update_key)
+        limit_integrated <- .call_llm(prompt = prompt_limit_int,
+                                      system_prompt = system_prompt,
+                                      LLM_model = LLM_model,
+                                      max_tokens = max_tokens,
+                                      update_key = update_key,
+                                      custom_llm_fn = custom_llm_fn)
 
         variables_imp <- gsub("\n\n", " ", limit_integrated$output)  # remove "\n\n"  from LLM output
         raw5_LLM <- c(prompt = prompt_limit_int, system_prompt = system_prompt, limit_integrated$raw_content)
