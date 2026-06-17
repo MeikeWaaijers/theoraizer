@@ -10,7 +10,8 @@ find_source(topic,
             scientific = TRUE,
             LLM_model = "gpt-4.1",
             max_tokens = 2000,
-            update_key = FALSE)
+            update_key = FALSE,
+            custom_llm_fn = NULL)
 }
 \arguments{
 \item{topic}{A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.}
@@ -26,6 +27,8 @@ find_source(topic,
 \item{max_tokens}{The maximum number of tokens the LLM should generate. Be careful when adjusting this argument. Reducing the maximum token limit will reduce the cost but may result in incomplete answers. Conversely, increasing the token limit can be advantageous for obtaining more detailed responses. The maximum number of tokens depends on the model. As of now, only \code{"gpt-4.1"} is supported for this function, with a maximum token limit of \code{6000}.}
 
 \item{update_key}{If \code{update_key = TRUE}, the function will prompt the user for a new API key and update the saved key. If \code{update_key = FALSE} (default), the function will use the existing API key if available.}
+
+\item{custom_llm_fn}{Optionally, a custom function to use instead of the built-in LLM models. If provided, the \code{LLM_model}, \code{max_tokens}, and \code{update_key} arguments are ignored; handle those inside your custom function. The function must accept \code{prompt} and \code{system_prompt} as arguments and return a list with at minimum \code{$output} (the response text as a character string), and \code{$sources} (a character vector of citation URLs found by the model). Since the purpose of this function is to find sources, your custom function should use an LLM with web search or browsing capabilities so that \code{$sources} can be populated. If \code{$sources} is omitted or \code{NULL}, the \code{sources} column in the output will be \code{NA}.}
 }
 \value{
 \itemize{

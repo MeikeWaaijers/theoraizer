@@ -33,7 +33,8 @@
 #'             scientific = TRUE,
 #'             LLM_model = "gpt-4.1",
 #'             max_tokens = 2000,
-#'             update_key = FALSE)
+#'             update_key = FALSE,
+#'             custom_llm_fn = NULL)
 #'
 #' @details
 #' To create a theory from scratch, the functions in this R-package should be used in the following order:
@@ -47,8 +48,8 @@
 #' @param LLM_model The LLM model that should be used to generate output. As of now, only \code{"gpt-4.1"} is available for this function. Other models may be added in future updates.
 #' @param max_tokens The maximum number of tokens the LLM should generate. Be careful when adjusting this argument. Reducing the maximum token limit will reduce the cost but may result in incomplete answers. Conversely, increasing the token limit can be advantageous for obtaining more detailed responses. The maximum number of tokens depends on the model. As of now, only \code{"gpt-4.1"} is supported for this function, with a maximum token limit of \code{6000}.
 #' @inheritParams var_list
+#' @param custom_llm_fn Optionally, a custom function to use instead of the built-in LLM models. If provided, the \code{LLM_model}, \code{max_tokens}, and \code{update_key} arguments are ignored; handle those inside your custom function. The function must accept \code{prompt} and \code{system_prompt} as arguments and return a list with at minimum \code{$output} (the response text as a character string), and \code{$sources} (a character vector of citation URLs found by the model). Since the purpose of this function is to find sources, your custom function should use an LLM with web search or browsing capabilities so that \code{$sources} can be populated. If \code{$sources} is omitted or \code{NULL}, the \code{sources} column in the output will be \code{NA}.
 #'
-#' @inheritParams var_list
 #'
 #' @returns
 #' \itemize{
@@ -122,7 +123,8 @@ find_source <- function(topic,
                         scientific = TRUE,
                         LLM_model = "gpt-4.1",
                         max_tokens = 2000,
-                        update_key = FALSE) {
+                        update_key = FALSE,
+                        custom_llm_fn = NULL) {
 
   # Validate input
   stopifnot(
@@ -145,10 +147,18 @@ find_source <- function(topic,
                 all(edge_list$sign %in% c("Positive", "Negative", "Uncertain")))
   }
 
-  stopifnot("'LLM_model' should be 'gpt-4.1'" = LLM_model == "gpt-4.1")
+  stopifnot("'LLM_model' should be 'gpt-4.1'" =
+              !is.null(custom_llm_fn) || LLM_model == "gpt-4.1")
   stopifnot("For 'gpt-4.1', 'max_tokens' should be a whole number above 0, and not higher than 6000." =
-              is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens > 0 && max_tokens <= 6000)
+              !is.null(custom_llm_fn) || (is.numeric(max_tokens) && max_tokens == floor(max_tokens) && max_tokens > 0 && max_tokens <= 6000))
 
+  if (!is.null(custom_llm_fn)) {
+    stopifnot("'custom_llm_fn' must be a function accepting 'prompt' and 'system_prompt'." =
+                is.function(custom_llm_fn) &&
+                all(c("prompt", "system_prompt") %in% names(formals(custom_llm_fn))))
+    if (update_key) message("'update_key' is ignored when 'custom_llm_fn' is provided.")
+    message("'LLM_model' and 'max_tokens' are ignored when 'custom_llm_fn' is provided.")
+    message("Warning: this function is designed to find sources for causal relationships. Your custom function should use an LLM with web search or browsing capabilities and return '$sources' (a character vector of citation URLs). Without it, the 'sources' column will be NA and this function will provide little value over a standard LLM call.")}
 
   ## Load and prepare prompt data
   prompt_file_path <- system.file("extdata", "prompts.csv", package = "theoraizer")
@@ -273,13 +283,21 @@ find_source <- function(topic,
 
 
     tryCatch({
-      result <- LLM(prompt = prompt,
-                    LLM_model = LLM_model,
-                    max_tokens = max_tokens,
-                    temperature = 0,
-                    logprobs = FALSE,
-                    raw_output = TRUE,
-                    update_key = update_key)
+      if (!is.null(custom_llm_fn)) {
+        result <- custom_llm_fn(prompt = prompt, system_prompt = NULL)
+        if (is.null(result$raw_content))
+          result$raw_content <- list(LLM_model = "custom", content = result$output,
+                                     finish_reason = NA, prompt_tokens = NA,
+                                     answer_tokens = NA, total_tokens = NA, error = NULL)
+      } else {
+        result <- LLM(prompt = prompt,
+                      LLM_model = LLM_model,
+                      max_tokens = max_tokens,
+                      temperature = 0,
+                      logprobs = FALSE,
+                      raw_output = TRUE,
+                      update_key = update_key)
+      }
 
       update_key <- FALSE # make sure api key is only updated once
 
