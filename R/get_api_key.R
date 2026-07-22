@@ -1,4 +1,4 @@
-# Program Name: theoraizer
+# Program Name: CLDassist
 # Description: This function interacts with Large Language Model (LLM) APIs and extracts their output.
 # Copyright (C) <2024> <Meike Waaijers>
 #
@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-### theoraizer
+### CLDassist
 
 ## get_api_key helper function
 

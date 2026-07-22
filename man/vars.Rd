@@ -35,7 +35,7 @@ Generated using the OpenAI platform: \url{https://platform.openai.com}
 vars
 }
 \description{
-This data set contains 2 lists of variables related to the context of addiction.
+This data set contains 2 lists of variables related to the topic addiction.
 The data was generated using the \code{\link{var_list}} function and the "gpt-4o" Large Language Model (LLM).
 }
 \examples{

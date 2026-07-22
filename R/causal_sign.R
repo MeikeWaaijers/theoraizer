@@ -1,4 +1,4 @@
-# Program Name: theoraizer
+# Program Name: CLDassist
 # Description: In the causal_sign function a Large Language Model (LLM) is asked to determine whether a causal relationship is positive or negative.
 # Copyright (C) <2024> <Meike Waaijers>
 #
@@ -16,7 +16,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-#### theoraizer
+#### CLDassist
 ### Sign of causal relationship (positive or negative relationship)
 
 ## Function manual
@@ -36,11 +36,11 @@
 #'             custom_llm_fn = NULL)
 #'
 #' @details
-#' To create a theory from scratch, the functions in this R-package should be used in the following order:
+#' To create a CLD from scratch, the functions in this R-package should be used in the following order:
 #'
-#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{find_source}}
+#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{search_literature}}
 #'
-#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
+#' @param topic A character vector specifying the topic for which a CLD should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
 #' @param prob_df Two different probability dataframes can be inputted:
 #' \itemize{
 #'   \item A dataframe with 3 columns and on every row a unique variable pair and the probability of the presence of a causal relationship between these variables (The \code{relation_df} output from the \code{\link{causal_relation}} function).
@@ -128,7 +128,7 @@
 #' \code{\link{causal_relation}},
 #' \code{\link{causal_direction}},
 #' \code{\link{cld_plot}},
-#' \code{\link{find_source}}
+#' \code{\link{search_literature}}
 #'
 #' @examples
 #' \dontrun{
@@ -240,7 +240,7 @@ causal_sign <- function(topic,
   }
 
   ## Load and prepare prompt data
-  prompt_file_path <- system.file("extdata", "prompts.csv", package = "theoraizer")
+  prompt_file_path <- system.file("extdata", "prompts.csv", package = "CLDassist")
   prompts_data <- utils::read.csv(prompt_file_path, sep = ";")
 
   # replace '\\n' with '\n' in all text columns

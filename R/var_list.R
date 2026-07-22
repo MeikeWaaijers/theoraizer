@@ -1,4 +1,4 @@
-# Program Name: theoraizer
+# Program Name: CLDassist
 # Description: In the var_list function a Large Language Model (LLM) is instructed to generate a list of important variables for a particular topic.
 # Copyright (C) <2024> <Meike Waaijers>
 #
@@ -16,7 +16,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-#### theoraizer
+#### CLDassist
 ### Variable listing function
 
 ## Function manual
@@ -44,11 +44,11 @@
 #'          custom_llm_fn = NULL)
 #'
 #' @details
-#' To create a theory from scratch, the functions in this R-package should be used in the following order:
+#' To create a CLD from scratch, the functions in this R-package should be used in the following order:
 #'
-#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{find_source}}
+#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{search_literature}}
 #'
-#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
+#' @param topic A character vector specifying the topic for which a CLD should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
 #' @param include_topic If \code{include_topic = FALSE} (default), the topic specified in the \code{"topic"} argument will not be included as a seperate variable in the variable list.
 #' @param n_variables Number of variables the LLM should generate in the first 2 variable lists. If \code{"all"} (default), the LLM is not limited to generate a specific number of variables, but is asked to create a list of "all" important variables.
 #' @param n_final Number of variables to be included in the final variable list. If \code{inf} (default), the final integrated variable list will not be limited to a certain number of variables.
@@ -89,7 +89,7 @@
 #' \code{\link{causal_direction}},
 #' \code{\link{causal_sign}},
 #' \code{\link{cld_plot}},
-#' \code{\link{find_source}}
+#' \code{\link{search_literature}}
 #'
 #' @examples
 #' \dontrun{
@@ -156,7 +156,7 @@ var_list <- function(topic,
   }
 
   ## Load and prepare prompt data
-  prompt_file_path <- system.file("extdata", "prompts.csv", package = "theoraizer")
+  prompt_file_path <- system.file("extdata", "prompts.csv", package = "CLDassist")
   prompts_data <- utils::read.csv(prompt_file_path, sep = ";")
 
   # replace '\\n' with '\n' in all text columns

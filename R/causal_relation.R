@@ -1,4 +1,4 @@
-# Program Name: theoraizer
+# Program Name: CLDassist
 # Description: In the causal_relation function a Large Language Model (LLM) is asked to indicate whether there is a causal or non-causal relationship between variable pairs.
 # Copyright (C) <2024> <Meike Waaijers>
 #
@@ -16,7 +16,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-#### theoraizer
+#### CLDassist
 ### Causal relation function
 
 ## Function manual
@@ -35,12 +35,12 @@
 #'                 custom_llm_fn = NULL)
 #'
 #' @details
-#' To create a theory from scratch, the functions in this R-package should be used in the following order:
+#' To create a CLD from scratch, the functions in this R-package should be used in the following order:
 #'
-#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{find_source}}
+#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{search_literature}}
 #'
-#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
-#' @param variable_list A vector containing all variables that need to be included in the theory.
+#' @param topic A character vector specifying the topic for which a CLD should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
+#' @param variable_list A vector containing all variables that need to be included in the CLD.
 #' @inheritParams var_list
 #'
 #' @returns
@@ -80,7 +80,7 @@
 #' \code{\link{causal_direction}},
 #' \code{\link{causal_sign}},
 #' \code{\link{cld_plot}},
-#' \code{\link{find_source}}
+#' \code{\link{search_literature}}
 #'
 #' @examples
 #' \dontrun{
@@ -147,7 +147,7 @@ causal_relation <- function(topic,
   }
 
   ## Load and prepare prompt data
-  prompt_file_path <- system.file("extdata", "prompts.csv", package = "theoraizer")
+  prompt_file_path <- system.file("extdata", "prompts.csv", package = "CLDassist")
   prompts_data <- utils::read.csv(prompt_file_path, sep = ";")
 
   # replace '\\n' with '\n' in all text columns

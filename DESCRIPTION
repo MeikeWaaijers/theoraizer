@@ -1,14 +1,14 @@
-Package: theoraizer
+Package: CLDassist
 Type: Package
-Title: Develop Theories using Large Language Models
+Title: Develop Candidate Causal Loop Diagrams Using Large Language Models
 Version: 2.2.0
 Authors@R: person("Meike", "Waaijers", email = "m.waaijers@uva.nl",
   role = c("aut", "cre"))
 Maintainer: Meike Waaijers <m.waaijers@uva.nl>
-Description: Use Large Language Models (LLMs) to construct a coherent theory
-  within the Causal Loop Diagram (CLD) framework. The theory consists of key
-  variables and their causal relationships, and can be visually represented.
-URL: https://github.com/MeikeWaaijers/theoraizer
+Description: Constructs a Causal Loop Diagram (CLD) using Large Language
+  Models (LLMs). A CLD consists of key variables and their causal
+  relationships, and can be visually represented
+URL: https://github.com/MeikeWaaijers/CLDassist
 Depends: 
     R (>= 3.5)
 Imports: 

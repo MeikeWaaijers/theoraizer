@@ -1,5 +1,5 @@
-# Program Name: theoraizer
-# Description: This data set contains 2 lists of variables related to the context of addiction. The data was generated using the "gpt-4o" Large Language Model (LLM).
+# Program Name: CLDassist
+# Description: This data set contains 2 lists of variables related to the topic addiction. The data was generated using the "gpt-4o" Large Language Model (LLM).
 # Copyright (C) <2024> <Meike Waaijers>
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,12 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-#### theoraizer
+#### CLDassist
 ### vars data set
 
 #' vars data
 #'
-#' This data set contains 2 lists of variables related to the context of addiction.
+#' This data set contains 2 lists of variables related to the topic addiction.
 #' The data was generated using the \code{\link{var_list}} function and the "gpt-4o" Large Language Model (LLM).
 #'
 #' @format A list containing the following components:

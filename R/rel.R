@@ -1,4 +1,4 @@
-# Program Name: theoraizer
+# Program Name: CLDassist
 # Description: This data set contains the probabilities of the presence of causal relationships between various variables related to the topic of addiction. The data was generated using the "gpt-4o" Large Language Model (LLM).
 # Copyright (C) <2024> <Meike Waaijers>
 #
@@ -16,7 +16,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-#### theoraizer
+#### CLDassist
 ### rel data set
 
 #' rel data

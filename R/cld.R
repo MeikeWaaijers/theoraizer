@@ -1,4 +1,4 @@
-# Program Name: theoraizer
+# Program Name: CLDassist
 # Description: The cld function can be used to quickly generate a Causal Loop Diagram (CLD).
 # Copyright (C) <2024> <Meike Waaijers>
 #
@@ -16,7 +16,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-#### theoraizer
+#### CLDassist
 ### CLD function
 
 ## Function manual
@@ -36,12 +36,12 @@
 #'     custom_llm_fn = NULL)
 #'
 #' @details
-#' To create a theory from scratch, the functions in this R-package should be used in the following order:
+#' To create a CLD from scratch, the functions in this R-package should be used in the following order:
 #'
-#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{find_source}}
+#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{search_literature}}
 #'
-#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the parameter can be set to NULL.
-#' @param variable_list A vector containing all variables that need to be included in the theory.
+#' @param topic A character vector specifying the topic for which a CLD should be developed. If it is not feasible to identify a particular topic, the parameter can be set to NULL.
+#' @param variable_list A vector containing all variables that need to be included in the CLD.
 #' @param plot If \code{plot = TRUE} (default), the function will generate network plot(s) visualizing the edge list(s).
 #' @inheritParams var_list
 #'
@@ -108,7 +108,7 @@
 #' \code{\link{causal_direction}},
 #' \code{\link{causal_sign}},
 #' \code{\link{cld_plot}},
-#' \code{\link{find_source}}
+#' \code{\link{search_literature}}
 #'
 #' @examples
 #' \dontrun{
@@ -186,7 +186,7 @@ cld <- function(topic,
   causrel <- NULL
   causdir <- NULL
   caussign <- NULL
-  theoryplot <- NULL
+  cldplot <- NULL
 
   # Step 1: causal_relation
   tryCatch({
@@ -240,7 +240,7 @@ cld <- function(topic,
   # Step 4: cld_plot (optional)
   if (plot == TRUE) {
     tryCatch({
-      theoryplot <- cld_plot(topic = topic,
+      cldplot <- cld_plot(topic = topic,
                              dir_sign_df = caussign$sign_df)
     }, error = function(e) {
       if (is_shiny) {
@@ -270,7 +270,7 @@ cld <- function(topic,
   output$sign_df <- caussign$sign_df
 
   if (plot == TRUE){
-    output$edge_list <- theoryplot$dir_signs_edge_list
+    output$edge_list <- cldplot$dir_signs_edge_list
   }
 
   return(output)

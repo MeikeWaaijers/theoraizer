@@ -1,2 +1,2 @@
 library(testthat)
-test_check("theoraizer")
+test_check("CLDassist")

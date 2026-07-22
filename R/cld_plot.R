@@ -1,4 +1,4 @@
-# Program Name: theoraizer
+# Program Name: CLDassist
 # Description: The cld_plot function creates an edge list for each probability dataframe provided. These edge lists are then transformed into network graphs using the qgraph package.
 # Copyright (C) <2024> <Meike Waaijers>
 #
@@ -16,8 +16,8 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-#### theoraizer
-### Theory visualization function
+#### CLDassist
+### CLD visualization function
 
 ## Function manual
 
@@ -43,11 +43,11 @@
 #'          not_plot = FALSE)
 #'
 #' @details
-#' To create a theory from scratch, the functions in this R-package should be used in the following order:
+#' To create a CLD from scratch, the functions in this R-package should be used in the following order:
 #'
-#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{find_source}}
+#' \code{\link{var_list}} --> \code{\link{causal_relation}} --> \code{\link{causal_direction}} --> \code{\link{causal_sign}} --> \code{\link{cld_plot}} --> \code{\link{search_literature}}
 #'
-#' @param topic A character vector specifying the topic for which a theory should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
+#' @param topic A character vector specifying the topic for which a CLD should be developed. If it is not feasible to identify a particular topic, the argument can be set to NULL.
 #' @param relation_df A dataframe with a unique pair of variables on each row and the probability of the existence of a causal relationship between these variables. (The \code{relation_df} output of the \code{\link{causal_relation}} function).
 #' @param direction_df A dataframe with on every row a unique variable pair, the probability of the presence of a causal relationship between these variables, and the cause variable probability for each variable in the pair (The \code{direction_df} output from the \code{\link{causal_direction}}.
 #' @param rel_sign_df A dataframe containing all pairs of variables, the probability of a causal relationship between these variables, and the probability of a positive or negative causal relationship (the \code{sign_df} output of the \code{\link{causal_sign}} function when a \code{prob_causual_df} is inputted in the \code{\link{causal_sign}} function).
@@ -102,7 +102,7 @@
 #' \code{\link{causal_relation}},
 #' \code{\link{causal_direction}},
 #' \code{\link{causal_sign}},
-#' \code{\link{find_source}},
+#' \code{\link{search_literature}},
 #' \code{\link[qgraph]{qgraph}}
 #'
 #' @examples

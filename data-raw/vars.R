@@ -1,5 +1,5 @@
 vars <- var_list(topic = "Addiction",
-                 include_context = FALSE,
+                 include_topic = FALSE,
                  n_final = 10,
                  n_variables = "all",
                  LLM_model = "gpt-4o",

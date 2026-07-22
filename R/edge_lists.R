@@ -1,4 +1,4 @@
-# Program Name: theoraizer
+# Program Name: CLDassist
 # Description: This data set contains a list of 4 edge lists related to the topic of addiction. The data was generated using the "gpt-4o" Large Language Model (LLM).
 # Copyright (C) <2024> <Meike Waaijers>
 #
@@ -16,7 +16,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 
-#### theoraizer
+#### CLDassist
 ### edge_lists data set
 
 
