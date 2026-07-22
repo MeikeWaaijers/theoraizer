@@ -7,7 +7,7 @@ Authors@R: person("Meike", "Waaijers", email = "m.waaijers@uva.nl",
 Maintainer: Meike Waaijers <m.waaijers@uva.nl>
 Description: Constructs a Causal Loop Diagram (CLD) using Large Language
   Models (LLMs). A CLD consists of key variables and their causal
-  relationships, and can be visually represented
+  relationships, and can be visually represented.
 URL: https://github.com/MeikeWaaijers/CLDassist
 Depends: 
     R (>= 3.5)
