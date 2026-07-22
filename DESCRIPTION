@@ -1,7 +1,7 @@
 Package: CLDassist
 Type: Package
 Title: Develop Candidate Causal Loop Diagrams Using Large Language Models
-Version: 2.2.0
+Version: 3.0.0
 Authors@R: person("Meike", "Waaijers", email = "m.waaijers@uva.nl",
   role = c("aut", "cre"))
 Maintainer: Meike Waaijers <m.waaijers@uva.nl>
