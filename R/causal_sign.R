@@ -538,9 +538,9 @@ causal_sign <- function(topic,
     ## LLM var 1
     pair <- 1
 
-    print("1/2")
+    message("1/2")
     for (i in row_index_var1) {
-      print(paste("Variable pair:  ", pair,  "/", length(row_index_var1)))
+      message(sprintf("Variable pair: %d / %d", pair, length(row_index_var1)))
 
       # Initialize the prompt database outside of the loops
       var1_prompt_database <- list()
@@ -641,9 +641,9 @@ causal_sign <- function(topic,
     #LLM var 2
     pair <- 1
 
-    print("2/2")
+    message("2/2")
     for (l in row_index_var2) {
-      print(paste("Variable pair:  ", pair,  "/", length(row_index_var2)))
+      message(sprintf("Variable pair: %d / %d", pair, length(row_index_var2)))
 
       # Initialize the prompt database outside of the loops
       var2_prompt_database <- list()
@@ -1101,7 +1101,7 @@ causal_sign <- function(topic,
   output$sign_df <- sign_df
 
   if (which_df == "relation") {
-    print(paste0("Total of LLM prompts: ", length(row_index) * 8))
+    message(sprintf("Total of LLM prompts: %d", length(row_index) * 8))
 
     # give openai error if there is no output at all
     if (length(output) == 0) {
@@ -1127,7 +1127,7 @@ causal_sign <- function(topic,
     }
 
   } else if (which_df == "direction") {
-    print(paste0("Total of LLM prompts: ", (length(row_index_var1) * 4) + (length(row_index_var2) * 4)))
+    message(sprintf("Total of LLM prompts: %d", (length(row_index_var1) * 4) + (length(row_index_var2) * 4)))
 
     # give openai error if there is no output at all
     if (length(output) == 0) {
